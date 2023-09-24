@@ -1,11 +1,17 @@
-#include <QtHttpServer/QHttpServer>
-#include <QtHttpServer/QHttpServerResponse>
+#include <QHttpServer>
+#include <QHttpServerResponse>
+#include <QtHttpServerDepends>
 
 #include <QCoreApplication>
 
-#include <QtSql/QSqlDatabase>
-#include <QtSql/QSqlError>
-#include <QtSql/QSqlQuery>
+#include <QSqlDatabase>
+#include <QSqlError>
+#include <QSqlQuery>
+
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QJsonArray>
+
 
 using namespace Qt::StringLiterals;
 
@@ -43,26 +49,46 @@ int main(int argc, char *argv[])
         return "Hello world";
     });
 
-    httpServer.route("/auth/", []() {
-        QSqlQuery query("INSERT INTO UsersServer (Id, Login, Password) "
-                        "VALUES ('alexey', 'shabarshov', 'alex228')");
-        qDebug() << "Inserting complite";
-        return "Auth Success";
-    });
+    httpServer.route("/auth/", [](const QHttpServerRequest &request) {
+        QJsonDocument json;
+        QJsonArray recordsArray;
+        QSqlQuery query("SELECT * FROM UsersServer");
 
-    httpServer.route("/resp", [] () {
-        QSqlQuery query("SELECT * from UsersServer");
         if (query.size() > 0)
             while(query.next()) {
-                qDebug() << query.value(0).toString();
-                qDebug() << query.value(1).toString();
-                qDebug() << query.value(2).toString();
+                QJsonObject obj;
+                obj.insert("id", query.value(0).toString());
+                obj.insert("login", query.value(1).toString());
+                obj.insert("password", query.value(2).toString());
+                recordsArray.push_back(obj);
             }
         else
             qDebug() << "There are not users";
 
-        return "Get data";
+        json.setArray(recordsArray);
+        return json.toJson();
     });
+
+//    httpServer.route("/auth/", []() {
+//        QSqlQuery query("INSERT INTO UsersServer (Id, Login, Password) "
+//                        "VALUES ('alexey', 'shabarshov', 'alex228')");
+//        qDebug() << "Inserting complite";
+//        return "Auth Success";
+//    });
+
+//    httpServer.route("/resp", [] () {
+//        QSqlQuery query("SELECT * from UsersServer");
+//        if (query.size() > 0)
+//            while(query.next()) {
+//                qDebug() << query.value(0).toString();
+//                qDebug() << query.value(1).toString();
+//                qDebug() << query.value(2).toString();
+//            }
+//        else
+//            qDebug() << "There are not users";
+
+//        return "Get data";
+//    });
 
     httpServer.route("/del", [] () {
         QSqlQuery query("DELETE from UsersServer");
