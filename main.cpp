@@ -12,7 +12,6 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 
-
 using namespace Qt::StringLiterals;
 
 int main(int argc, char *argv[])
@@ -20,7 +19,6 @@ int main(int argc, char *argv[])
     QCoreApplication app(argc, argv);
 
     QHttpServer httpServer;
-
     QSqlDatabase* db;
     QSqlQuery query;
 
@@ -46,7 +44,7 @@ int main(int argc, char *argv[])
     }
 
     httpServer.route("/", []() {
-        return "Hello world";
+        return "Hi";
     });
 
     httpServer.route("/resp/", [](const QHttpServerRequest &request) {
@@ -78,7 +76,7 @@ int main(int argc, char *argv[])
             QSqlQuery query;
             query.prepare("INSERT INTO UsersServer (Id, Login, Password) "
                           "VALUES (:id, :login, :password)");
-            query.bindValue(":id", QJsonDocument::fromJson(request.body()).object().value("id"));
+            query.bindValue(":id", QJsonDocument::fromJson(request.body()).object().value("id").toString());
             query.bindValue(":login", QJsonDocument::fromJson(request.body()).object().value("login").toString());
             query.bindValue(":password", QJsonDocument::fromJson(request.body()).object().value("password").toString());
             if (query.exec()) {
@@ -98,7 +96,7 @@ int main(int argc, char *argv[])
     });
 
 // return {
-//      { " message ": "error/success"}
+//      { " message ": " error/success"}
 //    }
 
 
