@@ -64,4 +64,5 @@ def main():
         json.dump(data, outfile, indent=4, sort_keys=True,  ensure_ascii=False)
 #хуйнятвтварь
 if __name__ == '__main__':
+    # test
     main()
