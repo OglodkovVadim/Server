@@ -62,6 +62,6 @@ def main():
 
     with open("Data/parsText.json", "w", encoding="utf-8") as outfile:
         json.dump(data, outfile, indent=4, sort_keys=True,  ensure_ascii=False)
-
+#хуйнятвтварь
 if __name__ == '__main__':
     main()
