@@ -14,6 +14,75 @@
 
 using namespace Qt::StringLiterals;
 
+class UserManager {
+public:
+    UserManager() = default;
+
+    const QString signIn();
+    const QString signUp();
+    const QString deleteAcc();
+};
+
+
+
+class Text {
+public:
+    Text()
+        : id(0),  text(""), countWords(0)
+    {}
+    Text(uint16_t _id, QString& _text, uint16_t _countWords)
+        : id(_id), text(_text), countWords(_countWords)
+    {}
+
+    uint16_t
+    QString
+
+private:
+    uint16_t id;
+    QString text;
+    uint16_t countWords;
+};
+
+class User {
+public:
+    User() : {};
+private:
+    uint16_t id;
+    QString login;
+    QString password;
+//    QVector<uint16_t>* ;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
@@ -104,6 +173,9 @@ int main(int argc, char *argv[])
         QSqlQuery query("DELETE from UsersServer");
         return "Deleted data :(";
     });
+
+
+    // test git security
 
     return app.exec();
 }
