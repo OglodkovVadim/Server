@@ -11,6 +11,14 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QJsonArray>
+#include <QVector>
+
+#define KEY_ID "id"
+#define KEY_TEXT "text"
+#define KEY_COUNT "countWords"
+#define KEY_LOGIN "login"
+#define KEY_PASSWORD "password"
+#define KEY_SOLVED_TEXTS "solvedTexts"
 
 using namespace Qt::StringLiterals;
 
@@ -24,18 +32,47 @@ public:
 };
 
 
+/*
+ *
+ * Achivement
+ *
+ */
+
+
 
 class Text {
 public:
-    Text()
-        : id(0),  text(""), countWords(0)
+    Text() :
+        id(0),
+        text(""),
+        countWords(0)
     {}
-    Text(uint16_t _id, QString& _text, uint16_t _countWords)
-        : id(_id), text(_text), countWords(_countWords)
+    Text(const uint16_t _id, const QString& _text, const uint16_t _countWords) :
+        id(_id),
+        text(_text),
+        countWords(_countWords)
+    {}
+    Text(const QJsonObject& obj) :
+        id(obj.value(KEY_ID).toInt()),
+        text(obj.value(KEY_TEXT).toString()),
+        countWords(obj.value(KEY_COUNT).toInt())
     {}
 
-    uint16_t
-    QString
+    const uint16_t getId() { return id; }
+    const QString& getText() { return text; }
+    const uint16_t getCountWords() { return countWords; }
+
+    void setId(uint16_t _id) { this->id = _id; }
+    void setText(QString& _text) { this->text = _text; }
+    void setCountWords(uint16_t _countWords) { this->countWords = _countWords; }
+
+    const QJsonObject toJson() const {
+        QJsonObject obj;
+        obj.insert(KEY_ID, this->id);
+        obj.insert(KEY_TEXT, this->text);
+        obj.insert(KEY_COUNT, this->countWords);
+        return obj;
+    }
 
 private:
     uint16_t id;
@@ -45,12 +82,31 @@ private:
 
 class User {
 public:
-    User() : {};
+    User() :
+        id(0),
+        login(""),
+        password(""),
+        texts(0)
+    {}
+    User(const uint16_t _id, const QString& _login, const QString& _password, const QVector<Text *>& _texts) :
+        id(_id),
+        login(_login),
+        password(_password),
+        texts(_texts)
+    {}
+    User(const QJsonObject& obj) :
+        id(obj.value(KEY_ID).toInt()),
+        login(obj.value(KEY_LOGIN).toString()),
+        password(obj.value(KEY_PASSWORD).toString()),
+        texts(obj.value(KEY_SOLVED_TEXTS).toArray())
+
+    {}
 private:
     uint16_t id;
     QString login;
     QString password;
-//    QVector<uint16_t>* ;
+    QVector<Text *> texts;
+    // e-mail
 };
 
 
