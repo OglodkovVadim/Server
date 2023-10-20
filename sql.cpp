@@ -12,18 +12,23 @@ void Sql::init (
     const uint16_t port
 )
 {
-    data_base.setHostName(hostName);
-    data_base.setUserName(userName);
-    data_base.setPassword(password);
-    data_base.setPort(port);
+    try {
+        data_base.setHostName(hostName);
+        data_base.setUserName(userName);
+        data_base.setPassword(password);
+        data_base.setPort(port);
+        data_base.open();
+        qDebug() << "Data base opened sucessful";
+    } catch (...) {
+    qDebug() << data_base.lastError();
+    }
 }
 
+
+// ???? This func will work only once
 void Sql::createTables()
 {
     try {
-        data_base.open();
-        qDebug() << "Data base opened sucessful";
-
     // create table for users (only users info)
         query.exec(
             "CREATE TABLE users ("
@@ -69,11 +74,71 @@ void Sql::createTables()
         query.exec(
             "CREATE TABLE texts ("
                 "id BIGINT PRIMARY KEY,"
-                "text TEXT NOT NULL"
+                "text TEXT NOT NULL,"
+                "count_words INT NOT NULL"
             ")"
         );
 
     } catch (...) {
         qDebug() << data_base.lastError();
     }
+}
+
+void Sql::addUser(const QJsonObject& object)
+{
+    try {
+        query.exec();
+        query.prepare("INSERT INTO users (id, login, password, date_registration) "
+                      "VALUES (?, ?, ?, ?)");
+        query.bindValue(0, object.value(KEY_LOGIN).toInteger());
+        query.bindValue(1, object.value(KEY_LOGIN).toString());
+        query.bindValue(2, object.value(KEY_PASSWORD).toString());
+        query.bindValue(3, object.value(KEY_DATE_REGISTRATION).toString());
+        if (query.exec())
+            qDebug() << "User added sucessful";
+        else
+            qDebug() << query.lastError();
+    } catch (...) {
+        qDebug() << data_base.lastError();
+    }
+}
+
+void Sql::addText()
+{
+    query.prepare("INSERT INTO texts (id, text, count_words) "
+                  "VALUES (?, ?, ?)");
+    query.bindValue(0, 519);
+    query.bindValue(1, "eqweqw");
+    query.bindValue(2, 1);
+    query.exec();
+    qDebug() << "Text inserted sucessfully";
+}
+
+const QJsonObject Sql::getRandomText(const uint16_t _count_words)
+{
+    try {
+        query.prepare("SELECT * FROM texts "
+                      "WHERE count_words = ?");
+        query.bindValue(0, _count_words);
+
+        if (query.exec()) {
+            uint16_t random_id = QRandomGenerator::global()->bounded(1, query.size());
+            int counter = 0;
+            do {
+                qDebug() << counter;
+                if (counter == random_id)
+                    return QJsonObject {
+                        {"id", query.value(0).toInt()},
+                        {"text", query.value(1).toString()},
+                        {"count_words", query.value(2).toInt()}
+                    };
+                counter++;
+            } while (query.next());
+        }
+        else
+            qDebug() << query.lastError();
+    } catch (...) {
+        qDebug() << data_base.lastError();
+    }
+    return {{"Response", 503}};
 }

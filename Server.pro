@@ -9,6 +9,7 @@ CONFIG += c++17 cmdline
 SOURCES += \
         main.cpp \
         sql.cpp \
+        text.cpp \
         user.cpp
 
 # Default rules for deployment.
@@ -17,5 +18,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
+    libs.h \
     sql.h \
+    text.h \
     user.h
