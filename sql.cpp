@@ -79,6 +79,9 @@ void Sql::createTables()
             ")"
         );
 
+    // create table for words (list of words)
+        query.exec("CREATE TABLE words (text TEXT NOT NULL)");
+
     } catch (...) {
         qDebug() << data_base.lastError();
     }
@@ -114,31 +117,52 @@ void Sql::addText()
     qDebug() << "Text inserted sucessfully";
 }
 
-const QJsonObject Sql::getRandomText(const uint16_t _count_words)
+QJsonObject findText(QSqlQuery& query, const uint16_t _count_words) {
+    query.prepare("SELECT * FROM texts "
+                  "WHERE count_words = ?");
+    query.bindValue(0, _count_words);
+
+    if (query.exec()) {
+        uint16_t random_id = QRandomGenerator::global()->bounded(1, query.size());
+        query.seek(random_id);
+
+        return {
+            {"text", query.value(1).toString()},
+            {"Respone", 200}
+        };
+    }
+    return {
+        {"Response", 503}
+    };
+}
+
+QJsonObject generateWords(QSqlQuery& query, const uint16_t _count_words) {
+    query.exec("SELECT * FROM words");
+    query.first();
+    QStringList all_words = query.value(0).toString().split("\n");
+    QString text;
+    for (int i = 0; i < _count_words; i++) {
+        text += all_words[QRandomGenerator::global()->bounded(1, all_words.size())] + " ";
+    }
+    return {
+        {"text", text},
+        {"Response", 200}
+    };
+}
+
+const QJsonObject Sql::getRandomText(TextType type, const uint16_t _count_words)
 {
     try {
-        query.prepare("SELECT * FROM texts "
-                      "WHERE count_words = ?");
-        query.bindValue(0, _count_words);
-
-        if (query.exec()) {
-            uint16_t random_id = QRandomGenerator::global()->bounded(1, query.size());
-            int counter = 0;
-            do {
-                qDebug() << counter;
-                if (counter == random_id)
-                    return QJsonObject {
-                        {"id", query.value(0).toInt()},
-                        {"text", query.value(1).toString()},
-                        {"count_words", query.value(2).toInt()}
-                    };
-                counter++;
-            } while (query.next());
-        }
-        else
-            qDebug() << query.lastError();
+        switch(type) {
+            case TextType::text:
+                return findText(query, _count_words);
+            case TextType::words:
+                return generateWords(query, _count_words);
+            }
     } catch (...) {
         qDebug() << data_base.lastError();
     }
-    return {{"Response", 503}};
+    return {
+        {"Response", 503}
+    };
 }

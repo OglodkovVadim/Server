@@ -2,6 +2,8 @@
 #define SQL_H
 
 #include "libs.h"
+#include "user.h"
+#include "text.h"
 
 #include <QSqlDatabase>
 #include <QSqlError>
@@ -10,7 +12,7 @@
 #include <QRandomGenerator>
 #include <QDate>
 
-class Sql
+class Sql : protected User, protected Text
 {
 public:
     explicit Sql();
@@ -24,8 +26,8 @@ public:
 
     void createTables();
 
+    const QJsonObject getRandomText(const TextType, const uint16_t);
     void addUser(const QJsonObject&);
-    const QJsonObject getRandomText(const uint16_t);
     void addText();
 
 private:

@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
 
     Sql sql;
     sql.init(hostName, userName, password, port);
-//    sql.createTables();
+    sql.createTables();
 //    QJsonObject obj;
 //    obj.insert(KEY_ID, 123459);
 //    obj.insert(KEY_LOGIN, "dada");
@@ -90,9 +90,9 @@ int main(int argc, char *argv[])
 //    obj.insert(KEY_DATE_REGISTRATION, QDate(2000, 12, 2).toString("yyyy.MM.dd"));
 //    sql.addUser(obj);
 //    sql.addText();
-    while (true)
-        if (sql.getRandomText(1).value(KEY_ID) == 0)
-            Text::print(sql.getRandomText(1));
+
+    qDebug() << sql.getRandomText(TextType::words, 20);
+    qDebug() << sql.getRandomText(TextType::text, 1);
 
 //    if (httpServer.listen(QHostAddress::Any, 80)) {
 //        qDebug() << "Listen...";
