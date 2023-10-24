@@ -25,7 +25,7 @@ const TextType Text::stringToType(const QString& str) {
 }
 
 const QString Text::typeToString(const TextType& type) {
-    return type == TextType::text ? "text" : "words";
+    return type == TextType::text ? KEY_TEXT : KEY_WORDS;
 }
 
 const uint16_t Text::getId() const { return id; }

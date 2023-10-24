@@ -110,7 +110,6 @@ void Sql::addText()
 {
     query.prepare("INSERT INTO texts (id, text, count_words) "
                   "VALUES (?, ?, ?)");
-    query.bindValue(0, 519);
     query.bindValue(1, "eqweqw");
     query.bindValue(2, 1);
     query.exec();
@@ -127,12 +126,12 @@ QJsonObject findText(QSqlQuery& query, const uint16_t _count_words) {
         query.seek(random_id);
 
         return {
-            {"text", query.value(1).toString()},
-            {"Respone", 200}
+            {KEY_TEXT, query.value(1).toString()},
+            {KEY_RESPONSE, 200}
         };
     }
     return {
-        {"Response", 503}
+        {KEY_RESPONSE, 503}
     };
 }
 
@@ -145,8 +144,8 @@ QJsonObject generateWords(QSqlQuery& query, const uint16_t _count_words) {
         text += all_words[QRandomGenerator::global()->bounded(1, all_words.size())] + " ";
     }
     return {
-        {"text", text},
-        {"Response", 200}
+        {KEY_TEXT, text},
+        {KEY_RESPONSE, 200}
     };
 }
 
@@ -163,6 +162,6 @@ const QJsonObject Sql::getRandomText(TextType type, const uint16_t _count_words)
         qDebug() << data_base.lastError();
     }
     return {
-        {"Response", 503}
+        {KEY_RESPONSE, 503}
     };
 }

@@ -8,7 +8,7 @@ User::User() :
 {}
 
 User::User(
-    const uint16_t id,
+    const quint32 id,
     const QString login,
     const QString password,
     const QDate date_registration
@@ -20,7 +20,7 @@ User::User(
 
 {}
 
-const uint16_t User::getId() const {
+const quint32 User::getId() const {
     return this->id;
 }
 const QString User::getLogin() const {
@@ -33,7 +33,7 @@ const QDate User::getDateRegistration() const {
     return this->date_registration;
 }
 
-void User::setId(const uint16_t id) {
+void User::setId(const quint32 id) {
     this->id = id;
 }
 void User::setLogin(const QString login) {
@@ -65,7 +65,7 @@ User::User(const QJsonObject& object) :
 const QJsonObject User::toJson()
 {
     QJsonObject obj;
-    obj.insert(KEY_ID, this->id);
+    obj.insert(KEY_ID, static_cast<int>(this->id));
     obj.insert(KEY_LOGIN, this->login);
     obj.insert(KEY_PASSWORD, this->password);
     obj.insert(KEY_DATE_REGISTRATION, this->date_registration.toString());
