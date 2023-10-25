@@ -9,7 +9,7 @@ void Sql::init (
     const QString hostName,
     const QString userName,
     const QString password,
-    const uint16_t port
+    const quint32 port
 )
 {
     try {
@@ -87,36 +87,44 @@ void Sql::createTables()
     }
 }
 
-void Sql::addUser(const QJsonObject& object)
+
+
+QJsonObject Sql::addUser(const QJsonObject& object)
 {
-    try {
-        query.exec();
-        query.prepare("INSERT INTO users (id, login, password, date_registration) "
-                      "VALUES (?, ?, ?, ?)");
-        query.bindValue(0, object.value(KEY_LOGIN).toInteger());
-        query.bindValue(1, object.value(KEY_LOGIN).toString());
-        query.bindValue(2, object.value(KEY_PASSWORD).toString());
-        query.bindValue(3, object.value(KEY_DATE_REGISTRATION).toString());
-        if (query.exec())
-            qDebug() << "User added sucessful";
-        else
-            qDebug() << query.lastError();
-    } catch (...) {
-        qDebug() << data_base.lastError();
-    }
+    query.exec();
+    query.prepare("INSERT INTO users (id, login, password, date_registration) "
+                  "VALUES (?, ?, ?, ?)");
+    query.bindValue(0, object.value(KEY_LOGIN).toInteger());
+    query.bindValue(1, object.value(KEY_LOGIN).toString());
+    query.bindValue(2, object.value(KEY_PASSWORD).toString());
+    query.bindValue(3, object.value(KEY_DATE_REGISTRATION).toString());
+    if (query.exec())
+        return {
+            {RESPONSE_TEXT, RESPONSE_CODE_OK}
+        };
+
+    return {
+        {RESPONSE_TEXT, RESPONSE_CODE_BAD}
+    };
 }
 
-void Sql::addText()
+QJsonObject Sql::addText()
 {
     query.prepare("INSERT INTO texts (id, text, count_words) "
                   "VALUES (?, ?, ?)");
     query.bindValue(1, "eqweqw");
     query.bindValue(2, 1);
-    query.exec();
-    qDebug() << "Text inserted sucessfully";
+    if (query.exec())
+        return {
+            {RESPONSE_TEXT, RESPONSE_CODE_OK}
+        };
+
+    return {
+        {RESPONSE_TEXT, RESPONSE_CODE_BAD}
+    };
 }
 
-QJsonObject findText(QSqlQuery& query, const uint16_t _count_words) {
+QJsonObject findText(QSqlQuery& query, const quint32 _count_words) {
     query.prepare("SELECT * FROM texts "
                   "WHERE count_words = ?");
     query.bindValue(0, _count_words);
@@ -127,41 +135,44 @@ QJsonObject findText(QSqlQuery& query, const uint16_t _count_words) {
 
         return {
             {KEY_TEXT, query.value(1).toString()},
-            {KEY_RESPONSE, 200}
+            {RESPONSE_TEXT, RESPONSE_CODE_OK}
         };
     }
     return {
-        {KEY_RESPONSE, 503}
+        {RESPONSE_TEXT, RESPONSE_CODE_BAD}
     };
 }
 
-QJsonObject generateWords(QSqlQuery& query, const uint16_t _count_words) {
-    query.exec("SELECT * FROM words");
-    query.first();
-    QStringList all_words = query.value(0).toString().split("\n");
-    QString text;
-    for (int i = 0; i < _count_words; i++) {
-        text += all_words[QRandomGenerator::global()->bounded(1, all_words.size())] + " ";
+QJsonObject generateWords(QSqlQuery& query, const quint32 _count_words) {
+    if (query.exec("SELECT * FROM words")) {
+        query.first();
+        QStringList all_words = query.value(0).toString().split("\n");
+        QString text;
+        for (int i = 0; i < _count_words; i++) {
+            text += all_words[QRandomGenerator::global()->bounded(1, all_words.size())] + " ";
+        }
+        return {
+            {KEY_TEXT, text},
+            {RESPONSE_TEXT, RESPONSE_CODE_OK}
+        };
     }
     return {
-        {KEY_TEXT, text},
-        {KEY_RESPONSE, 200}
+        {RESPONSE_TEXT, RESPONSE_CODE_BAD}
     };
 }
 
-const QJsonObject Sql::getRandomText(TextType type, const uint16_t _count_words)
+const QJsonObject Sql::getRandomText(TextType type, const quint32 _count_words)
 {
     try {
         switch(type) {
             case TextType::text:
-                return findText(query, _count_words);
+            return findText(query, _count_words);
             case TextType::words:
                 return generateWords(query, _count_words);
             }
     } catch (...) {
-        qDebug() << data_base.lastError();
+            return {
+                {RESPONSE_TEXT, RESPONSE_CODE_BAD}
+            };
     }
-    return {
-        {KEY_RESPONSE, 503}
-    };
 }

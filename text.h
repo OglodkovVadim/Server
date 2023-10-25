@@ -11,17 +11,17 @@ enum class TextType {
 class Text {
 public:
     Text();
-    Text(const uint16_t, const QString&, const uint16_t, const TextType);
+    Text(const quint32, const QString&, const quint32, const TextType);
     Text(const QJsonObject&);
 
-    const uint16_t getId() const;
+    const quint32 getId() const;
     const QString& getText() const;
-    const uint16_t getCountWords() const;
+    const quint32 getCountWords() const;
     const TextType getTextType() const;
 
-    void setId(const uint16_t);
+    void setId(const quint32);
     void setText(const QString&);
-    void setCountWords(const uint16_t);
+    void setCountWords(const quint32);
     void setTextType(const TextType);
 
     const QJsonObject toJson() const;
@@ -31,9 +31,9 @@ public:
     const static QString typeToString(const TextType&);
 
 private:
-    uint16_t id;
+    quint32 id;
     QString text;
-    uint16_t count_words;
+    quint32 count_words;
     TextType type;
 };
 

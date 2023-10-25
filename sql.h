@@ -21,14 +21,14 @@ public:
         const QString,
         const QString,
         const QString,
-        const uint16_t
+        const quint32
     );
 
     void createTables();
 
-    const QJsonObject getRandomText(const TextType, const uint16_t);
-    void addUser(const QJsonObject&);
-    void addText();
+    const QJsonObject getRandomText(const TextType, const quint32);
+    QJsonObject addUser(const QJsonObject&);
+    QJsonObject addText();
 
 private:
     QSqlDatabase data_base;

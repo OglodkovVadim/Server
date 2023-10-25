@@ -15,6 +15,7 @@
 
 #include "sql.h"
 #include "text.h"
+#include "server.h"
 
 const QString hostName = "127.0.0.1";
 const QString userName = "postgres";
@@ -78,11 +79,54 @@ int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
 
+    Server server;
+    Sql sql;
+
+    sql.init(hostName, userName, password, port);
+
+    server.init();
+    server.routeHome();
+
+//    QHttpServer httpServer;
+//    QSqlDatabase* db;
+//    QSqlQuery query;
+
+//    db = new QSqlDatabase(QSqlDatabase::addDatabase("QPSQL"));
+//    db->setHostName("127.0.0.1");
+//    db->setUserName("postgres");
+//    db->setPassword("1234");
+//    db->setPort(5432);
+
+//    if (!db->open())
+//        qDebug() << db->lastError();
+//    else {
+//        qDebug() << "data base opened sucessful";
+//        query = QSqlQuery(*db);
+//    }
+
+//    if (httpServer.listen(QHostAddress::Any, 80)) {
+//        qDebug() << "Listen...";
+//    }
+
+//    httpServer.route("/", []() {
+//        return "Hi";
+//    });
+
+
+
+
+
+//    Sql sql;
+//    sql.init(hostName, userName, password, port);
+//    Server server;
+//    qDebug() << server.init();
+   // server.routeHome();
+
+
 //    QHttpServer httpServer;
 
-    Sql sql;
-    sql.init(hostName, userName, password, port);
-    sql.createTables();
+//    sql.createTables();
+//    sql.addText();
 //    QJsonObject obj;
 //    obj.insert(KEY_ID, 123459);
 //    obj.insert(KEY_LOGIN, "dada");
@@ -91,8 +135,8 @@ int main(int argc, char *argv[])
 //    sql.addUser(obj);
 //    sql.addText();
 
-    qDebug() << sql.getRandomText(TextType::words, 20);
-    qDebug() << sql.getRandomText(TextType::text, 1);
+//    qDebug() << sql.getRandomText(TextType::words, 20);
+//    qDebug() << sql.getRandomText(TextType::text, 1);
 
 //    if (httpServer.listen(QHostAddress::Any, 80)) {
 //        qDebug() << "Listen...";
