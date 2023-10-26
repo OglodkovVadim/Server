@@ -31,7 +31,7 @@ public:
     const QJsonObject toJson();
 //    const QDate stringToDate(QString) noexcept;
 
-    const User getUserFromDB(const quint32 id);
+//    const User getUserFromDB(const quint32 id);
 
 private:
     quint32 id;

@@ -4,7 +4,6 @@
 #include <QHttpServer>
 #include <QSharedPointer>
 
-#include "libs.h"
 #include "sql.h"
 
 #define DEFAULT_PORT 80

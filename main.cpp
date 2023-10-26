@@ -85,7 +85,15 @@ int main(int argc, char *argv[])
     sql.init(hostName, userName, password, port);
 
     server.init();
-    server.routeHome();
+    server.routeHome(sql);
+
+
+//    int* arr = new int[4];
+//    qDebug() << "arr: " << arr;
+//    qDebug() << "&arr[0]: " << &arr[0];
+//    qDebug() << "&arr[1]: " << &arr[1];
+//    qDebug() << "&arr[2]: " << &arr[2];
+//    qDebug() << "&arr[3]: " << &arr[3];
 
 //    QHttpServer httpServer;
 //    QSqlDatabase* db;
@@ -111,6 +119,15 @@ int main(int argc, char *argv[])
 //    httpServer.route("/", []() {
 //        return "Hi";
 //    });
+
+//    httpServer.route("/<arg>/<arg>/",
+//                    QHttpServerRequest::Method::Get,
+//                    [](const QString &firstArg,
+//                           const QString &secondArg,
+//                           const QHttpServerRequest &request) {
+//                        qDebug() << firstArg << " " << secondArg;
+//                        return "Ok";
+//                    });
 
 
 

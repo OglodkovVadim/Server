@@ -17,21 +17,22 @@ bool Server::init()
     return httpServer->listen(QHostAddress::Any, port);
 }
 
-QJsonObject Server::routeHome()
+QJsonObject Server::routeHome(Sql &sql)
 {
-    httpServer->route(ROUTE_HOME, [](const QHttpServerRequest &request) {
-        qDebug() << request.body().data();
+    httpServer->route("/", [&sql](const QHttpServerRequest &request) {
         switch (request.method()) {
-            case METHOD_POST:
-                if (request.body().contains("12345")) {
-                        qDebug() << "FAJPFOHFPOBFAF";
-                    }
-                break;
+        case METHOD_GET:
+            qDebug() << request.query().queryItemValue("type");
+            break;
+        case METHOD_POST:
+            qDebug() << sql.getRandomText(TextType::words, request.body().at(1));
+            break;
         }
-        return "Cool";
+        return "Ok";
     });
 
     return {
         {RESPONSE_TEXT, RESPONSE_CODE_BAD}
     };
 }
+
