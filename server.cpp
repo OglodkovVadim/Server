@@ -22,7 +22,8 @@ QJsonObject Server::routeHome(Sql &sql)
     httpServer->route("/", [&sql](const QHttpServerRequest &request) {
         switch (request.method()) {
         case METHOD_GET:
-            qDebug() << request.query().queryItemValue("type");
+            qDebug() << request.query().queryItems();
+
             break;
         case METHOD_POST:
             qDebug() << sql.getRandomText(TextType::words, request.body().at(1));

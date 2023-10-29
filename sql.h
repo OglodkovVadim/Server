@@ -28,10 +28,10 @@ public:
 
     const QJsonObject getRandomText(const TextType, const quint32);
     QJsonObject addUser(const QJsonObject&);
-    QJsonObject addText();
+    const QJsonObject addText();
 
 private:
-    QSqlDatabase data_base;
+    QSqlDatabase sql_database;
     QSqlQuery query;
 };
 

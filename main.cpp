@@ -14,7 +14,6 @@
 #include <QVector>
 
 #include "sql.h"
-#include "text.h"
 #include "server.h"
 
 const QString hostName = "127.0.0.1";
@@ -86,6 +85,8 @@ int main(int argc, char *argv[])
 
     server.init();
     server.routeHome(sql);
+
+//    qDebug() << sizeof(int) << Qt::endl << sizeof(QSqlDatabase);
 
 
 //    int* arr = new int[4];
