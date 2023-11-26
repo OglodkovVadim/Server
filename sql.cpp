@@ -1,4 +1,4 @@
-#include "sql.h"
+ #include "sql.h"
 
 Sql::Sql() :
     sql_database(QSqlDatabase(QSqlDatabase::addDatabase("QPSQL"))),
@@ -88,12 +88,12 @@ void Sql::createTables()
 }
 
 
-QJsonObject Sql::addUser(const QJsonObject& object)
+const QJsonObject Sql::addUser(const QJsonObject& object)
 {
-    query.exec();
     query.prepare("INSERT INTO users (id, login, password, date_registration) "
-                  "VALUES (?, ?, ?, ?)");
-    query.bindValue(0, object.value(KEY_LOGIN).toInteger());
+                  "VALUES (?, ?, ?, ?)"
+                  );
+    query.bindValue(0, object.value(KEY_ID).toString());
     query.bindValue(1, object.value(KEY_LOGIN).toString());
     query.bindValue(2, object.value(KEY_PASSWORD).toString());
     query.bindValue(3, object.value(KEY_DATE_REGISTRATION).toString());
@@ -107,28 +107,32 @@ QJsonObject Sql::addUser(const QJsonObject& object)
     };
 }
 
-QJsonObject Sql::addText()
+const bool Sql::findUser(const QJsonObject& object)
 {
-    query.prepare("INSERT INTO texts (id, text, count_words) "
-                  "VALUES (?, ?, ?)");
-    query.bindValue(1, "eqweqw");
-    query.bindValue(2, 1);
-    if (query.exec())
-        return {
-            {RESPONSE_TEXT, RESPONSE_CODE_OK}
-        };
+    query.prepare("SELECT * FROM users "
+                  "WHERE login = ? and password = ? "
+                  );
+    query.bindValue(0, object.value(KEY_LOGIN).toString());
+    query.bindValue(1, object.value(KEY_PASSWORD).toString());
 
-    return {
-        {RESPONSE_TEXT, RESPONSE_CODE_BAD}
-    };
+
+    if (query.exec()) {
+        qDebug() << query.size();
+        return query.size() == 0 ? false : true;
+    }
+
+    return false;
 }
 
-QJsonObject findText(QSqlQuery& query, const quint32 count_words) {
+
+
+const QJsonObject Sql::generateText(QSqlQuery& query, const quint32 count_words) {
     query.prepare("SELECT * FROM texts "
                   "WHERE count_words = ?");
     query.bindValue(0, count_words);
 
     if (query.exec()) {
+        qDebug() <<  query.size();
         uint16_t random_id = QRandomGenerator::global()->bounded(1, query.size());
         query.seek(random_id);
 
@@ -142,7 +146,7 @@ QJsonObject findText(QSqlQuery& query, const quint32 count_words) {
     };
 }
 
-QJsonObject generateWords(QSqlQuery& query, const quint32 count_words) {
+const QJsonObject Sql::generateWords(QSqlQuery& query, const quint32 count_words) {
     if (query.exec("SELECT * FROM words")) {
         query.first();
         QStringList all_words = query.value(0).toString().split("\n");
@@ -151,7 +155,7 @@ QJsonObject generateWords(QSqlQuery& query, const quint32 count_words) {
             text += all_words[QRandomGenerator::global()->bounded(1, all_words.size())] + " ";
         }
         return {
-            {KEY_TEXT, text},
+            {KEY_WORDS, text},
             {RESPONSE_TEXT, RESPONSE_CODE_OK}
         };
     }
@@ -165,7 +169,7 @@ const QJsonObject Sql::getRandomText(const TextType type, const quint32 count_wo
     try {
         switch(type) {
             case TextType::text:
-                return findText(query, count_words);
+                return generateText(query, count_words);
             case TextType::words:
                 return generateWords(query, count_words);
             }
@@ -175,3 +179,24 @@ const QJsonObject Sql::getRandomText(const TextType type, const quint32 count_wo
             };
     }
 }
+
+
+
+
+
+
+//const QJsonObject Sql::addText()
+//{
+//    query.prepare("INSERT INTO texts (id, text, count_words) "
+//                  "VALUES (?, ?, ?)");
+//    query.bindValue(1, "eqweqw");
+//    query.bindValue(2, 1);
+//    if (query.exec())
+//        return {
+//            {RESPONSE_TEXT, RESPONSE_CODE_OK}
+//        };
+
+//    return {
+//        {RESPONSE_TEXT, RESPONSE_CODE_BAD}
+//    };
+//}

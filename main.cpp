@@ -82,9 +82,15 @@ int main(int argc, char *argv[])
     Sql sql;
 
     sql.init(hostName, userName, password, port);
-
     server.init();
+
     server.routeHome(sql);
+    server.routeSignIn(sql);
+    server.routeSignUp(sql);
+    server.routeProfile(sql);
+    server.routeSettings(sql);
+    server.routeStatistic(sql);
+
 
 //    qDebug() << sizeof(int) << Qt::endl << sizeof(QSqlDatabase);
 

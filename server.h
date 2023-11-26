@@ -27,12 +27,12 @@ public:
 
     bool init ();
 
-    QJsonObject routeHome(Sql &sql);
-    QJsonObject routeSignIn();
-    QJsonObject routeSignUp();
-    QJsonObject routeSettings();
-    QJsonObject routeStatistic();
-    QJsonObject routeProfile();
+    void routeHome(Sql&);
+    void routeSignIn(Sql&);
+    void routeSignUp(Sql&);
+    void routeSettings(Sql&);
+    void routeStatistic(Sql&);
+    void routeProfile(Sql&);
 
 private:
     quint16 port;

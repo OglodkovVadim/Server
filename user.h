@@ -2,7 +2,6 @@
 #define USER_H
 
 #include "qdatetime.h"
-#include "libs.h"
 
 
 
@@ -29,6 +28,8 @@ public:
     void setDate(const QDate);
 
     const QJsonObject toJson();
+
+//    static const QJsonObject g
 //    const QDate stringToDate(QString) noexcept;
 
 //    const User getUserFromDB(const quint32 id);

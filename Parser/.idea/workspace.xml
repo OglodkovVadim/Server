@@ -5,22 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="443dffde-04bf-4fdd-b8c1-d5a460a54041" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/Parser.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../build-Server-Desktop_Qt_6_5_2_MSVC2019_64bit-Debug/.qtc_clangd/.cache/clangd/index/server.cpp.B517AAA8C4D72F75.idx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../build-Server-Desktop_Qt_6_5_2_MSVC2019_64bit-Debug/.qtc_clangd/.cache/clangd/index/server.h.81A18A48DEA1639F.idx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../build-Server-Desktop_Qt_6_5_2_MSVC2019_64bit-Debug/debug/moc_predefs.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../server.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../server.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Server.pro" beforeDir="false" afterPath="$PROJECT_DIR$/../Server.pro" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../build-Server-Desktop_Qt_6_5_2_MSVC2019_64bit-Debug/.qtc_clangd/.cache/clangd/index/main.cpp.3E7FDF52D3A2A271.idx" beforeDir="false" afterPath="$PROJECT_DIR$/../build-Server-Desktop_Qt_6_5_2_MSVC2019_64bit-Debug/.qtc_clangd/.cache/clangd/index/main.cpp.3E7FDF52D3A2A271.idx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../build-Server-Desktop_Qt_6_5_2_MSVC2019_64bit-Debug/.qtc_clangd/compile_commands.json" beforeDir="false" afterPath="$PROJECT_DIR$/../build-Server-Desktop_Qt_6_5_2_MSVC2019_64bit-Debug/.qtc_clangd/compile_commands.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Source/ManageProgram/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Source/ManageProgram/ManageProgram.pro" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Source/ManageProgram/main.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Source/ManageProgram/mainwindow.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Source/ManageProgram/mainwindow.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Source/ManageProgram/mainwindow.ui" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../build-Server-Desktop_Qt_6_5_2_MSVC2019_64bit-Debug/.qtc_clangd/.cache/clangd/index/sql.cpp.5DDF69EEFBAD3E8C.idx" beforeDir="false" afterPath="$PROJECT_DIR$/../build-Server-Desktop_Qt_6_5_2_MSVC2019_64bit-Debug/.qtc_clangd/.cache/clangd/index/sql.cpp.5DDF69EEFBAD3E8C.idx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../build-Server-Desktop_Qt_6_5_2_MSVC2019_64bit-Debug/.qtc_clangd/.cache/clangd/index/sql.h.BF59A8A0713E3D53.idx" beforeDir="false" afterPath="$PROJECT_DIR$/../build-Server-Desktop_Qt_6_5_2_MSVC2019_64bit-Debug/.qtc_clangd/.cache/clangd/index/sql.h.BF59A8A0713E3D53.idx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../server.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../server.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../server.h" beforeDir="false" afterPath="$PROJECT_DIR$/../server.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../sql.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../sql.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../sql.h" beforeDir="false" afterPath="$PROJECT_DIR$/../sql.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../user.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user.h" beforeDir="false" afterPath="$PROJECT_DIR$/../user.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../web-typing-trainer" beforeDir="false" afterPath="$PROJECT_DIR$/../web-typing-trainer" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -31,9 +30,9 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 5
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
   <component name="ProjectId" id="2W1r87XMuwiI443ybdiHUItpBp8" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -44,7 +43,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "SqlClass",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -86,6 +85,7 @@
       <option name="presentableId" value="Default" />
       <updated>1695910764814</updated>
       <workItem from="1695910768121" duration="17572000" />
+      <workItem from="1701032691976" duration="5000" />
     </task>
     <servers />
   </component>

@@ -24,3 +24,6 @@ HEADERS += \
     sql.h \
     text.h \
     user.h
+
+RESOURCES += \
+    src.qrc

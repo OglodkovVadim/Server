@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/data">
+        <file>parsText.json</file>
+    </qresource>
+</RCC>

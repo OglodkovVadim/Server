@@ -27,8 +27,14 @@ public:
     void createTables();
 
     const QJsonObject getRandomText(const TextType, const quint32);
-    QJsonObject addUser(const QJsonObject&);
+    const QJsonObject generateText(QSqlQuery&, const quint32);
+    const QJsonObject generateWords(QSqlQuery&, const quint32);
+
+    const QJsonObject addUser(const QJsonObject&);
+    const bool findUser(const QJsonObject&);
+
     const QJsonObject addText();
+    const QJsonObject addStatistic(const QJsonObject&);
 
 private:
     QSqlDatabase sql_database;
