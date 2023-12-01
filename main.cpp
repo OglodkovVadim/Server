@@ -13,12 +13,22 @@
 #include <QJsonArray>
 #include <QVector>
 
+<<<<<<< HEAD
 #define KEY_ID "id"
 #define KEY_TEXT "text"
 #define KEY_COUNT "countWords"
 #define KEY_LOGIN "login"
 #define KEY_PASSWORD "password"
 #define KEY_SOLVED_TEXTS "solvedTexts"
+=======
+#include "sql.h"
+#include "server.h"
+
+const QString hostName = "127.0.0.1";
+const QString userName = "postgres";
+const QString password = "1234";
+const uint16_t port = 5432;
+>>>>>>> SqlClass
 
 using namespace Qt::StringLiterals;
 
@@ -40,6 +50,7 @@ public:
 
 
 
+<<<<<<< HEAD
 class Text {
 public:
     Text() :
@@ -108,6 +119,10 @@ private:
     QVector<Text *> texts;
     // e-mail
 };
+=======
+
+
+>>>>>>> SqlClass
 
 
 
@@ -143,52 +158,53 @@ int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
 
+<<<<<<< HEAD
     QHttpServer httpServer;
     QSqlDatabase* db;
     QSqlQuery query;
+=======
+    Server server;
+    Sql sql;
 
-    db = new QSqlDatabase(QSqlDatabase::addDatabase("QPSQL"));
-    db->setHostName("127.0.0.1");
-    db->setUserName("postgres");
-    db->setPassword("1234");
-    db->setPort(5432);
+    sql.init(hostName, userName, password, port);
+    server.init();
+>>>>>>> SqlClass
 
-    if (!db->open())
-        qDebug() << db->lastError();
-    else {
-        qDebug() << "data base opened sucessful";
-        query = QSqlQuery(*db);
-    }
+    server.routeHome(sql);
+    server.routeSignIn(sql);
+    server.routeSignUp(sql);
+    server.routeProfile(sql);
+    server.routeSettings(sql);
+    server.routeStatistic(sql);
 
-    if (!query.exec("CREATE TABLE IF NOT EXISTS UsersServer (Id TEXT, Login TEXT, Password TEXT)")) {
-        qDebug() << query.lastError();
-    }
 
-    if (httpServer.listen(QHostAddress::Any, 80)) {
-        qDebug() << "Listen...";
-    }
+//    qDebug() << sizeof(int) << Qt::endl << sizeof(QSqlDatabase);
 
+
+<<<<<<< HEAD
     httpServer.route("/", []() {
         return "Hi";
     });
+=======
+//    int* arr = new int[4];
+//    qDebug() << "arr: " << arr;
+//    qDebug() << "&arr[0]: " << &arr[0];
+//    qDebug() << "&arr[1]: " << &arr[1];
+//    qDebug() << "&arr[2]: " << &arr[2];
+//    qDebug() << "&arr[3]: " << &arr[3];
+>>>>>>> SqlClass
 
-    httpServer.route("/resp/", [](const QHttpServerRequest &request) {
-        QJsonDocument json;
-        if (request.method() == QHttpServerRequest::Method::Get) {
-            QJsonArray recordsArray;
-            QSqlQuery query("SELECT * FROM UsersServer");
+//    QHttpServer httpServer;
+//    QSqlDatabase* db;
+//    QSqlQuery query;
 
-            if (query.size() > 0)
-                while(query.next()) {
-                    QJsonObject obj;
-                    obj.insert("id", query.value(0).toString());
-                    obj.insert("login", query.value(1).toString());
-                    obj.insert("password", query.value(2).toString());
-                    recordsArray.push_back(obj);
-                }
-            else
-                qDebug() << "There are not users";
+//    db = new QSqlDatabase(QSqlDatabase::addDatabase("QPSQL"));
+//    db->setHostName("127.0.0.1");
+//    db->setUserName("postgres");
+//    db->setPassword("1234");
+//    db->setPort(5432);
 
+<<<<<<< HEAD
             json.setArray(recordsArray);
         }
         return json.toJson();
@@ -222,13 +238,100 @@ int main(int argc, char *argv[])
 
 // return {
 //      { " message ": " error/success"}
+=======
+//    if (!db->open())
+//        qDebug() << db->lastError();
+//    else {
+//        qDebug() << "data base opened sucessful";
+//        query = QSqlQuery(*db);
+>>>>>>> SqlClass
 //    }
 
+//    if (httpServer.listen(QHostAddress::Any, 80)) {
+//        qDebug() << "Listen...";
+//    }
 
-    httpServer.route("/del", [] () {
-        QSqlQuery query("DELETE from UsersServer");
-        return "Deleted data :(";
-    });
+//    httpServer.route("/", []() {
+//        return "Hi";
+//    });
+
+//    httpServer.route("/<arg>/<arg>/",
+//                    QHttpServerRequest::Method::Get,
+//                    [](const QString &firstArg,
+//                           const QString &secondArg,
+//                           const QHttpServerRequest &request) {
+//                        qDebug() << firstArg << " " << secondArg;
+//                        return "Ok";
+//                    });
+
+
+
+
+
+//    Sql sql;
+//    sql.init(hostName, userName, password, port);
+//    Server server;
+//    qDebug() << server.init();
+   // server.routeHome();
+
+
+//    QHttpServer httpServer;
+
+//    sql.createTables();
+//    sql.addText();
+//    QJsonObject obj;
+//    obj.insert(KEY_ID, 123459);
+//    obj.insert(KEY_LOGIN, "dada");
+//    obj.insert(KEY_PASSWORD, "dad");
+//    obj.insert(KEY_DATE_REGISTRATION, QDate(2000, 12, 2).toString("yyyy.MM.dd"));
+//    sql.addUser(obj);
+//    sql.addText();
+
+//    qDebug() << sql.getRandomText(TextType::words, 20);
+//    qDebug() << sql.getRandomText(TextType::text, 1);
+
+//    if (httpServer.listen(QHostAddress::Any, 80)) {
+//        qDebug() << "Listen...";
+//    }
+
+//    httpServer.route("/", []() {
+//        return "Hi";
+//    });
+
+//    httpServer.route("/resp/", [](const QHttpServerRequest &request) {
+//        QJsonDocument json;
+//        if (request.method() == QHttpServerRequest::Method::Get) {
+//            QJsonArray recordsArray;
+//            QSqlQuery query("SELECT * FROM UsersServer");
+
+//            if (query.size() > 0)
+//                while(query.next()) {
+//                    QJsonObject obj;
+//                    obj.insert("id", query.value(0).toString());
+//                    obj.insert("login", query.value(1).toString());
+//                    obj.insert("password", query.value(2).toString());
+//                    recordsArray.push_back(obj);
+//                }
+//            else
+//                qDebug() << "There are not users";
+
+//            json.setArray(recordsArray);
+//        }
+//        return json.toJson();
+//    });
+
+//    httpServer.route("/auth/", [&sql] (const QHttpServerRequest& request)  {
+//        sql.addUser(QJsonDocument::fromJson(request.body()).object());
+//    });
+
+
+//    httpServer.route("/del", [] () {
+//        QSqlQuery query("DELETE from UsersServer");
+//        return "Deleted data :(";
+//    });
+
+
+    // test git security
 
 
     // test git security

@@ -8,7 +8,10 @@ CONFIG += c++17 cmdline
 
 SOURCES += \
         main.cpp \
-        server.cpp
+        server.cpp \
+        sql.cpp \
+        text.cpp \
+        user.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -16,4 +19,11 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-    server.h
+    libs.h \
+    server.h \
+    sql.h \
+    text.h \
+    user.h
+
+RESOURCES += \
+    src.qrc
