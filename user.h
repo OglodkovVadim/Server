@@ -4,7 +4,6 @@
 #include "qdatetime.h"
 
 
-
 class User
 {
 public:

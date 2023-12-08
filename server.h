@@ -2,24 +2,10 @@
 #define SERVER_H
 
 #include <QHttpServer>
-<<<<<<< HEAD
 #include <QHttpServerResponse>
 #include <QtHttpServerDepends>
 
 #include <QObject>
-
-class Server : public QObject
-{
-    Q_OBJECT
-public:
-    explicit Server(QObject *parent = nullptr);
-
-private:
-    QHttpServer server;
-
-signals:
-
-=======
 #include <QSharedPointer>
 
 #include "sql.h"
@@ -55,7 +41,6 @@ public:
 private:
     quint16 port;
     QSharedPointer<QHttpServer> httpServer;
->>>>>>> SqlClass
 };
 
 #endif // SERVER_H

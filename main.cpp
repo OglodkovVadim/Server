@@ -13,14 +13,13 @@
 #include <QJsonArray>
 #include <QVector>
 
-<<<<<<< HEAD
 #define KEY_ID "id"
 #define KEY_TEXT "text"
 #define KEY_COUNT "countWords"
 #define KEY_LOGIN "login"
 #define KEY_PASSWORD "password"
 #define KEY_SOLVED_TEXTS "solvedTexts"
-=======
+
 #include "sql.h"
 #include "server.h"
 
@@ -28,7 +27,7 @@ const QString hostName = "127.0.0.1";
 const QString userName = "postgres";
 const QString password = "1234";
 const uint16_t port = 5432;
->>>>>>> SqlClass
+
 
 using namespace Qt::StringLiterals;
 
@@ -49,81 +48,74 @@ public:
  */
 
 
+//class Text {
+//public:
+//    Text() :
+//        id(0),
+//        text(""),
+//        countWords(0)
+//    {}
+//    Text(const uint16_t _id, const QString& _text, const uint16_t _countWords) :
+//        id(_id),
+//        text(_text),
+//        countWords(_countWords)
+//    {}
+//    Text(const QJsonObject& obj) :
+//        id(obj.value(KEY_ID).toInt()),
+//        text(obj.value(KEY_TEXT).toString()),
+//        countWords(obj.value(KEY_COUNT).toInt())
+//    {}
 
-<<<<<<< HEAD
-class Text {
-public:
-    Text() :
-        id(0),
-        text(""),
-        countWords(0)
-    {}
-    Text(const uint16_t _id, const QString& _text, const uint16_t _countWords) :
-        id(_id),
-        text(_text),
-        countWords(_countWords)
-    {}
-    Text(const QJsonObject& obj) :
-        id(obj.value(KEY_ID).toInt()),
-        text(obj.value(KEY_TEXT).toString()),
-        countWords(obj.value(KEY_COUNT).toInt())
-    {}
+//    const uint16_t getId() { return id; }
+//    const QString& getText() { return text; }
+//    const uint16_t getCountWords() { return countWords; }
 
-    const uint16_t getId() { return id; }
-    const QString& getText() { return text; }
-    const uint16_t getCountWords() { return countWords; }
+//    void setId(uint16_t _id) { this->id = _id; }
+//    void setText(QString& _text) { this->text = _text; }
+//    void setCountWords(uint16_t _countWords) { this->countWords = _countWords; }
 
-    void setId(uint16_t _id) { this->id = _id; }
-    void setText(QString& _text) { this->text = _text; }
-    void setCountWords(uint16_t _countWords) { this->countWords = _countWords; }
+//    const QJsonObject toJson() const {
+//        QJsonObject obj;
+//        obj.insert(KEY_ID, this->id);
+//        obj.insert(KEY_TEXT, this->text);
+//        obj.insert(KEY_COUNT, this->countWords);
+//        return obj;
+//    }
 
-    const QJsonObject toJson() const {
-        QJsonObject obj;
-        obj.insert(KEY_ID, this->id);
-        obj.insert(KEY_TEXT, this->text);
-        obj.insert(KEY_COUNT, this->countWords);
-        return obj;
-    }
+//private:
+//    uint16_t id;
+//    QString text;
+//    uint16_t countWords;
+//};
 
-private:
-    uint16_t id;
-    QString text;
-    uint16_t countWords;
-};
+//class User {
+//public:
+//    User() :
+//        id(0),
+//        login(""),
+//        password(""),
+//        texts(0)
+//    {}
+//    User(const uint16_t _id, const QString& _login, const QString& _password, const QVector<Text *>& _texts) :
+//        id(_id),
+//        login(_login),
+//        password(_password),
+//        texts(_texts)
+//    {}
+//    User(const QJsonObject& obj) :
+//        id(obj.value(KEY_ID).toInt()),
+//        login(obj.value(KEY_LOGIN).toString()),
+//        password(obj.value(KEY_PASSWORD).toString()),
+//        texts(obj.value(KEY_SOLVED_TEXTS).toArray())
 
-class User {
-public:
-    User() :
-        id(0),
-        login(""),
-        password(""),
-        texts(0)
-    {}
-    User(const uint16_t _id, const QString& _login, const QString& _password, const QVector<Text *>& _texts) :
-        id(_id),
-        login(_login),
-        password(_password),
-        texts(_texts)
-    {}
-    User(const QJsonObject& obj) :
-        id(obj.value(KEY_ID).toInt()),
-        login(obj.value(KEY_LOGIN).toString()),
-        password(obj.value(KEY_PASSWORD).toString()),
-        texts(obj.value(KEY_SOLVED_TEXTS).toArray())
-
-    {}
-private:
-    uint16_t id;
-    QString login;
-    QString password;
-    QVector<Text *> texts;
-    // e-mail
-};
-=======
-
-
->>>>>>> SqlClass
-
+//    {}
+//private:
+//    uint16_t id;
+//    QString login;
+//    QString password;
+//    QVector<Text *> texts;
+//    // e-mail
+//};
 
 
 
@@ -158,17 +150,14 @@ int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
 
-<<<<<<< HEAD
     QHttpServer httpServer;
     QSqlDatabase* db;
     QSqlQuery query;
-=======
     Server server;
     Sql sql;
 
     sql.init(hostName, userName, password, port);
     server.init();
->>>>>>> SqlClass
 
     server.routeHome(sql);
     server.routeSignIn(sql);
@@ -181,18 +170,15 @@ int main(int argc, char *argv[])
 //    qDebug() << sizeof(int) << Qt::endl << sizeof(QSqlDatabase);
 
 
-<<<<<<< HEAD
     httpServer.route("/", []() {
         return "Hi";
     });
-=======
 //    int* arr = new int[4];
 //    qDebug() << "arr: " << arr;
 //    qDebug() << "&arr[0]: " << &arr[0];
 //    qDebug() << "&arr[1]: " << &arr[1];
 //    qDebug() << "&arr[2]: " << &arr[2];
 //    qDebug() << "&arr[3]: " << &arr[3];
->>>>>>> SqlClass
 
 //    QHttpServer httpServer;
 //    QSqlDatabase* db;
@@ -204,47 +190,44 @@ int main(int argc, char *argv[])
 //    db->setPassword("1234");
 //    db->setPort(5432);
 
-<<<<<<< HEAD
-            json.setArray(recordsArray);
-        }
-        return json.toJson();
-    });
+//    json.setArray(recordsArray);
+//        }
+//        return json.toJson();
+//    });
 
-    httpServer.route("/auth/", [](const QHttpServerRequest& request) {
-        QString messageText = "Faild";
-        auto status = QHttpServerResponse::StatusCode::BadRequest;
-        if (request.method() == QHttpServerRequest::Method::Post) {
-            QSqlQuery query;
-            query.prepare("INSERT INTO UsersServer (Id, Login, Password) "
-                          "VALUES (:id, :login, :password)");
-            query.bindValue(":id", QJsonDocument::fromJson(request.body()).object().value("id").toString());
-            query.bindValue(":login", QJsonDocument::fromJson(request.body()).object().value("login").toString());
-            query.bindValue(":password", QJsonDocument::fromJson(request.body()).object().value("password").toString());
-            if (query.exec()) {
-                messageText = "Success";
-                status = QHttpServerResponse::StatusCode::Ok;
-                qDebug() << "Inserting complite";
-            }
-            else
-                messageText = query.lastError().text();
-        }
-        return QHttpServerResponse {
-            QJsonObject {
-                {"message", messageText}
-            },
-            status
-        };
-    });
+//    httpServer.route("/auth/", [](const QHttpServerRequest& request) {
+//        QString messageText = "Faild";
+//        auto status = QHttpServerResponse::StatusCode::BadRequest;
+//        if (request.method() == QHttpServerRequest::Method::Post) {
+//            QSqlQuery query;
+//            query.prepare("INSERT INTO UsersServer (Id, Login, Password) "
+//                          "VALUES (:id, :login, :password)");
+//            query.bindValue(":id", QJsonDocument::fromJson(request.body()).object().value("id").toString());
+//            query.bindValue(":login", QJsonDocument::fromJson(request.body()).object().value("login").toString());
+//            query.bindValue(":password", QJsonDocument::fromJson(request.body()).object().value("password").toString());
+//            if (query.exec()) {
+//                messageText = "Success";
+//                status = QHttpServerResponse::StatusCode::Ok;
+//                qDebug() << "Inserting complite";
+//            }
+//            else
+//                messageText = query.lastError().text();
+//        }
+//        return QHttpServerResponse {
+//            QJsonObject {
+//                {"message", messageText}
+//            },
+//            status
+//        };
+//    });
 
 // return {
 //      { " message ": " error/success"}
-=======
 //    if (!db->open())
 //        qDebug() << db->lastError();
 //    else {
 //        qDebug() << "data base opened sucessful";
 //        query = QSqlQuery(*db);
->>>>>>> SqlClass
 //    }
 
 //    if (httpServer.listen(QHostAddress::Any, 80)) {
