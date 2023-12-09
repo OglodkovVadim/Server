@@ -22,7 +22,7 @@ public:
         const QString,
         const QString,
         const quint32
-    );
+        );
 
     void createTables();
 
@@ -30,11 +30,19 @@ public:
     const QJsonObject generateText(QSqlQuery&, const quint32);
     const QJsonObject generateWords(QSqlQuery&, const quint32);
 
-    const QJsonObject addUser(const QJsonObject&);
+    const bool addUser(const QJsonObject&);
     const bool findUser(const QJsonObject&);
 
-    const QJsonObject addText();
-    const QJsonObject addStatistic(const QJsonObject&);
+    const bool addText();
+    const bool addStatistic(const QJsonObject&);
+
+    const DangerousValues changeUsername(const QJsonObject&);
+    const bool changePassword(const QJsonObject&);
+    const DangerousValues deleteAccount(const QJsonObject&);
+
+    const QJsonObject getProfileStat(const uint32_t id);
+
+
 
 private:
     QSqlDatabase sql_database;

@@ -19,8 +19,11 @@
 #define KEY_USER_ID "user_id"
 
 // for statistics
+#define KEY_SPEED "speed"
 #define KEY_MAX_SPEED "max_speed"
+#define KEY_COUNT_TEXTS "count_texts"
 #define KEY_AVERAGE_SPEED "average_speed"
+#define KEY_COUNT_MISTAKES "count_mistakes"
 #define KEY_AVERAGE_COUNT_MISTAKES "average_count_mistakes"
 
 #define RESPONSE_TEXT "Response"
@@ -32,5 +35,11 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QJsonArray>
+
+enum class DangerousValues {
+    True,
+    False,
+    Incorrect
+};
 
 #endif // LIBS_H
