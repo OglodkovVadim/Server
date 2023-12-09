@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 
     sql.init(hostName, userName, password, port);
     server.init();
-//    sql.createTables();
+    sql.createTables();
 
     server.routeHome(sql);
     server.routeSignIn(sql);

@@ -88,7 +88,7 @@ void Sql::createTables()
     }
 }
 
-
+// !!!!!!!!!!!!!delete id and date reg!!!!!!!!!!!!!!!
 const bool Sql::addUser(const QJsonObject& object)
 {
     query.prepare("INSERT INTO users (id, login, password, date_registration) "
