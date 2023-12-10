@@ -3,20 +3,17 @@
 Sql::Sql() :
     sql_database(QSqlDatabase(QSqlDatabase::addDatabase("QPSQL"))),
     query(QSqlQuery(sql_database))
-{}
+{
+    init();
+}
 
-void Sql::init (
-    const QString hostName,
-    const QString userName,
-    const QString password,
-    const quint32 port
-    )
+void Sql::init()
 {
     try {
-        sql_database.setHostName(hostName);
-        sql_database.setUserName(userName);
-        sql_database.setPassword(password);
-        sql_database.setPort(port);
+        sql_database.setHostName(SQL_HOST_NAME);
+        sql_database.setUserName(SQL_USER_NAME);
+        sql_database.setPassword(SQL_PASSWORD);
+        sql_database.setPort(SQL_PORT);
         sql_database.open();
         qDebug() << "Data base opened sucessful";
     } catch (...) {
@@ -134,6 +131,7 @@ const Auth Sql::findUser(const QJsonObject& object)
     }
 
 }
+
 
 
 const QJsonObject Sql::generateText(const Language lang, const quint32 count_words) {
@@ -300,6 +298,7 @@ const BoolValues Sql::deleteAccount(const QJsonObject& object)
 }
 
 
+
 const bool Sql::addStatistic(const QJsonObject& object)
 {
     try {
@@ -320,7 +319,6 @@ const bool Sql::addStatistic(const QJsonObject& object)
             average_count_mistakes = (average_count_mistakes*count + object.value(KEY_COUNT_MISTAKES).toString().toInt()) / (count + 1);
             ++count;
 
-            qDebug() << "Updating";
             query.prepare("UPDATE statistics SET "
                           "average_speed = ?, max_speed = ?, average_count_mistakes = ?, count_texts = count_texts + 1 "
                           "WHERE user_id = ? ");
@@ -332,7 +330,6 @@ const bool Sql::addStatistic(const QJsonObject& object)
             return query.exec();
         }
         else {
-            qDebug() << "Inserting";
             query.prepare("INSERT INTO statistics (id, average_speed, max_speed, average_count_mistakes, count_texts, user_id) "
                           "VALUES (?, ?, ?, ?, ?, ?) ");
 
@@ -378,6 +375,8 @@ const QJsonObject Sql::getProfileStat(const uint32_t id)
         return {};
     }
 }
+
+
 
 const void Sql::addText(const Language lang)
 {

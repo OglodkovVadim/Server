@@ -22,11 +22,9 @@
 
 #include "sql.h"
 #include "server.h"
+#include "backendtest.h"
 
-const QString hostName = "127.0.0.1";
-const QString userName = "postgres";
-const QString password = "1234";
-const uint16_t port = 5432;
+
 
 
 using namespace Qt::StringLiterals;
@@ -35,11 +33,11 @@ int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
 
+    QTest::qExec(new BackendTest);
+
     Server server;
     Sql sql;
 
-    server.init();
-    sql.init(hostName, userName, password, port);
     sql.createTables();
 
     sql.addText(Language::ru);

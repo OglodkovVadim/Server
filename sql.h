@@ -14,17 +14,17 @@
 #include <QJsonDocument>
 #include <QFile>
 
+#define SQL_HOST_NAME "127.0.0.1"
+#define SQL_USER_NAME "postgres"
+#define SQL_PASSWORD  "1234"
+#define SQL_PORT      5432
+
 class Sql
 {
 public:
     explicit Sql();
 
-    void init (
-        const QString,
-        const QString,
-        const QString,
-        const quint32
-        );
+    void init();
 
     void createTables();
 
@@ -34,10 +34,10 @@ public:
 
     const Auth addUser(const QJsonObject&);
     const Auth findUser(const QJsonObject&);
+    const bool addStatistic(const QJsonObject&);
 
     const void addText(const Language);
     const void addWords(const Language);
-    const bool addStatistic(const QJsonObject&);
 
     const BoolValues changeUsername(const QJsonObject&);
     const BoolValues changePassword(const QJsonObject&);

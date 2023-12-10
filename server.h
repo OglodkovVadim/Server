@@ -4,9 +4,7 @@
 #include <QHttpServer>
 #include <QHttpServerResponse>
 #include <QtHttpServerDepends>
-
 #include <QObject>
-#include <QSharedPointer>
 
 #include "sql.h"
 
@@ -44,6 +42,9 @@ public:
     void routeSettingsUsername(Sql&);
     void routeSettingsPassword(Sql&);
     void routeSettingsDelete(Sql&);
+
+    static const TextType getTextType(const QString&);
+    static const Language getLanguage(const QString&);
 
 private:
     quint16 port;

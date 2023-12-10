@@ -3,6 +3,10 @@
 Server::Server(const quint32 port)
 {
     this->port = port;
+    if (init())
+        qDebug() << "Server listen";
+    else
+        qDebug() << "Server failed";
 }
 
 Server::Server()
@@ -16,12 +20,12 @@ bool Server::init()
 }
 
 
-const TextType getTextType(const QString& str)
+const TextType Server::getTextType(const QString& str)
 {
     return str == "text" ? TextType::text : TextType::words;
 }
 
-const Language getLanguage(const QString& str)
+const Language Server::getLanguage(const QString& str)
 {
     return str == "ru" ? Language::ru : Language::en;
 }
