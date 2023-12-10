@@ -52,25 +52,6 @@ void Sql::createTables()
             ")"
             );
 
-        // create table for complited achivements (related to the table users by foreigen key user_id)
-//        query.exec(
-//            "CREATE TABLE IF NOT EXISTS complted_achivements ("
-//            "id BIGINT PRIMARY KEY,"
-//            "user_id BIGINT NOT NULL,"
-//            "CONSTRAINT user_id_fk FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE"
-//            ")"
-//            );
-
-        // create table for achivements (list of all achivements)
-//        query.exec(
-//            "CREATE TABLE IF NOT EXISTS achivements ("
-//            "id BIGINT PRIMARY KEY,"
-//            "title VARCHAR(64) NOT NULL,"
-//            "text TEXT NOT NULL,"
-//            "type INT NOT NULL"
-//            ")"
-//            );
-
         // create table for texts (list of all texts)
         query.exec(
             "CREATE TABLE IF NOT EXISTS ru_texts ("

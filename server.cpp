@@ -3,18 +3,16 @@
 Server::Server(const quint32 port)
 {
     this->port = port;
-    httpServer = QSharedPointer<QHttpServer>(new QHttpServer());
 }
 
 Server::Server()
 {
     this->port = DEFAULT_PORT;
-    httpServer = QSharedPointer<QHttpServer>(new QHttpServer());
 }
 
 bool Server::init()
 {
-    return httpServer->listen(QHostAddress::Any, port);
+    return httpServer.listen(QHostAddress::Any, port);
 }
 
 
@@ -32,7 +30,7 @@ const Language getLanguage(const QString& str)
 void Server::routeHome(Sql& sql) // Get -> (get text)   Post -> (insert statistic)
 {
 
-    httpServer->route(ROUTE_HOME, [&sql](const QHttpServerRequest &request) {
+    httpServer.route(ROUTE_HOME, [&sql](const QHttpServerRequest &request) {
         switch(request.method()) {
         case METHOD_GET:
             if (request.query().isEmpty()) {
@@ -64,7 +62,7 @@ void Server::routeHome(Sql& sql) // Get -> (get text)   Post -> (insert statisti
 
 void Server::routeSignIn(Sql& sql) // ??? Get/Post -> ()
 {
-    httpServer->route(ROUTE_SIGNIN, [&sql](const QHttpServerRequest &request) {
+    httpServer.route(ROUTE_SIGNIN, [&sql](const QHttpServerRequest &request) {
         Auth auth;
         switch (request.method()) {
         case METHOD_POST:
@@ -85,7 +83,7 @@ void Server::routeSignIn(Sql& sql) // ??? Get/Post -> ()
 
 void Server::routeSignUp(Sql&  sql) // Post -> (insert User)
 {
-    httpServer->route(ROUTE_SIGNUP, [&sql](const QHttpServerRequest &request) {
+    httpServer.route(ROUTE_SIGNUP, [&sql](const QHttpServerRequest &request) {
         Auth auth;
         switch (request.method()) {
         case METHOD_POST:
@@ -107,7 +105,7 @@ void Server::routeSignUp(Sql&  sql) // Post -> (insert User)
 
 void Server::routeSettingsUsername(Sql& sql)
 {
-    httpServer->route(ROUTE_SETTINGS_USERNAME, [&sql](const QHttpServerRequest &request) {
+    httpServer.route(ROUTE_SETTINGS_USERNAME, [&sql](const QHttpServerRequest &request) {
         switch (request.method()) {
         case METHOD_POST:
             switch(sql.changeUsername(QJsonDocument::fromJson(request.body().data()).object())) {
@@ -127,7 +125,7 @@ void Server::routeSettingsUsername(Sql& sql)
 
 void Server::routeSettingsPassword(Sql& sql)
 {
-    httpServer->route(ROUTE_SETTINGS_PASSWORD, [&sql](const QHttpServerRequest &request) {
+    httpServer.route(ROUTE_SETTINGS_PASSWORD, [&sql](const QHttpServerRequest &request) {
         switch (request.method()) {
         case METHOD_POST:
             switch(sql.changePassword(QJsonDocument::fromJson(request.body().data()).object())) {
@@ -146,7 +144,7 @@ void Server::routeSettingsPassword(Sql& sql)
 
 void Server::routeSettingsDelete(Sql& sql)
 {
-    httpServer->route(ROUTE_SETTINGS_DELETE, [&sql](const QHttpServerRequest &request) {
+    httpServer.route(ROUTE_SETTINGS_DELETE, [&sql](const QHttpServerRequest &request) {
         switch (request.method()) {
         case METHOD_DELETE:
             switch(sql.deleteAccount(QJsonDocument::fromJson(request.body().data()).object())) {
@@ -166,7 +164,7 @@ void Server::routeSettingsDelete(Sql& sql)
 
 void Server::routeProfile(Sql& sql) // Get -> (get Profile + get stat)
 {
-    httpServer->route(ROUTE_PROFILE, [&sql](const QHttpServerRequest &request) {
+    httpServer.route(ROUTE_PROFILE, [&sql](const QHttpServerRequest &request) {
         QJsonObject obj;
         switch (request.method()) {
         case METHOD_GET:

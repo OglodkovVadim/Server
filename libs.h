@@ -49,6 +49,10 @@ enum class Language {
     en
 };
 
+enum class TextType {
+    words,
+    text
+};
 
 struct Auth {
     BoolValues bool_values = BoolValues::False;

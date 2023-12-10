@@ -45,14 +45,9 @@ public:
     void routeSettingsPassword(Sql&);
     void routeSettingsDelete(Sql&);
 
-    QJsonObject wrong_passord {
-        {RESPONSE_MESSAGE, "Inncorrect login or password"}
-    };
-
-
 private:
     quint16 port;
-    QSharedPointer<QHttpServer> httpServer; 
+    QHttpServer httpServer;
 };
 
 #endif // SERVER_H

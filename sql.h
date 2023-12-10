@@ -2,8 +2,6 @@
 #define SQL_H
 
 #include "libs.h"
-#include "user.h"
-#include "text.h"
 
 #include <QSqlDatabase>
 #include <QSqlError>
@@ -16,7 +14,7 @@
 #include <QJsonDocument>
 #include <QFile>
 
-class Sql : protected User, protected Text
+class Sql
 {
 public:
     explicit Sql();
