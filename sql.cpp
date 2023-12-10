@@ -88,55 +88,87 @@ void Sql::createTables()
     }
 }
 
-// !!!!!!!!!!!!!delete id and date reg!!!!!!!!!!!!!!!
-const bool Sql::addUser(const QJsonObject& object)
-{
-    query.prepare("INSERT INTO users (id, login, password, date_registration) "
-                  "VALUES (?, ?, ?, ?)"
-                  );
-    query.bindValue(0, object.value(KEY_ID).toString());
-    query.bindValue(1, object.value(KEY_LOGIN).toString());
-    query.bindValue(2, object.value(KEY_PASSWORD).toString());
-    query.bindValue(3, object.value(KEY_DATE_REGISTRATION).toString());
 
-    return query.exec();
+
+const Auth Sql::addUser(const QJsonObject& object)
+{
+    Auth auth;
+    try {
+        query.prepare("SELECT * FROM users "
+                      "WHERE login = ? ");
+        query.bindValue(0, object.value(KEY_LOGIN).toString());
+        query.exec();
+        if (query.size() != 0) {
+            auth.bool_values = BoolValues::Incorrect;
+            return auth;
+        }
+
+        auth.id = QRandomGenerator::global()->bounded(10000, 10000000);
+        query.prepare("INSERT INTO users (id, login, password, date_registration) "
+                      "VALUES (?, ?, ?, ?) ");
+        query.bindValue(0, auth.id);
+        query.bindValue(1, object.value(KEY_LOGIN).toString());
+        query.bindValue(2, object.value(KEY_PASSWORD).toString());
+        query.bindValue(3, QDateTime::currentDateTime().toString("dd.MM.yyyy"));
+        query.exec();
+
+        auth.bool_values = BoolValues::True;
+        return auth;
+
+    } catch(...) {
+        qDebug() << query.lastError();
+        return auth;
+    }
 }
 
-const bool Sql::findUser(const QJsonObject& object)
+const Auth Sql::findUser(const QJsonObject& object)
 {
-    query.prepare("SELECT * FROM users "
-                  "WHERE login = ? and password = ? "
-                  );
-    query.bindValue(0, object.value(KEY_LOGIN).toString());
-    query.bindValue(1, object.value(KEY_PASSWORD).toString());
+    Auth auth;
+    try {
+        query.prepare("SELECT * FROM users "
+                      "WHERE login = ? and password = ? ");
+        query.bindValue(0, object.value(KEY_LOGIN).toString());
+        query.bindValue(1, object.value(KEY_PASSWORD).toString());
+        query.exec();
+        if (query.size() != 0) {
+            query.first();
+            auth.bool_values = BoolValues::True;
+            auth.id = query.value(0).toString().toInt();
+            return auth;
+        }
+        auth.bool_values = BoolValues::Incorrect;
+        return auth;
+    } catch(...) {
+        qDebug() << query.lastError();
+        return auth;
+    }
 
-    return query.exec() && query.size() != 0;
 }
-
 
 
 const QJsonObject Sql::generateText(QSqlQuery& query, const quint32 count_words) {
-    query.prepare("SELECT * FROM texts "
-                  "WHERE count_words = ?");
-    query.bindValue(0, count_words);
+    try {
+        query.prepare("SELECT * FROM texts "
+                      "WHERE count_words = ?");
+        query.bindValue(0, count_words);
+        query.exec();
 
-    if (query.exec()) {
-        qDebug() <<  query.size();
         uint16_t random_id = QRandomGenerator::global()->bounded(1, query.size());
         query.seek(random_id);
 
         return {
-            {KEY_TEXT, query.value(1).toString()},
-            {RESPONSE_TEXT, RESPONSE_CODE_OK}
+            {KEY_TEXT, query.value(1).toString()}
         };
+
+    } catch(...) {
+        qDebug() << query.lastError();
+        return {};
     }
-    return {
-        {RESPONSE_TEXT, RESPONSE_CODE_BAD}
-    };
 }
 
 const QJsonObject Sql::generateWords(QSqlQuery& query, const quint32 count_words) {
-    if (query.exec("SELECT * FROM words")) {
+    try {
+        query.exec("SELECT * FROM words");
         query.first();
         QStringList all_words = query.value(0).toString().split("\n");
         QString text;
@@ -144,41 +176,120 @@ const QJsonObject Sql::generateWords(QSqlQuery& query, const quint32 count_words
             text += all_words[QRandomGenerator::global()->bounded(1, all_words.size())] + " ";
         }
         return {
-            {KEY_WORDS, text},
-            {RESPONSE_TEXT, RESPONSE_CODE_OK}
+            {KEY_WORDS, text}
         };
+
+    } catch(...) {
+        qDebug() << query.lastError();
+        return {};
     }
-    return {
-        {RESPONSE_TEXT, RESPONSE_CODE_BAD}
-    };
 }
 
 const QJsonObject Sql::getRandomText(const TextType type, const quint32 count_words)
 {
-    return {
-        {"text", "fsefgesgsgsgse"}
-    };
-//    try {
-//        switch(type) {
-//        case TextType::text:
-//            return generateText(query, count_words);
-//        case TextType::words:
-//            return generateWords(query, count_words);
-//        }
-//    } catch (...) {
-//        return {
-//            {RESPONSE_TEXT, RESPONSE_CODE_BAD}
-//        };
-//    }
+    try {
+        switch(type) {
+        case TextType::text:
+            return generateText(query, count_words);
+        case TextType::words:
+            return generateWords(query, count_words);
+        }
+    }
+    catch(...) {
+
+    }
 }
+
+
+
+const BoolValues Sql::changeUsername(const QJsonObject& object)
+{
+    try {
+        query.prepare("SELECT * FROM users "
+                      "WHERE login = ? ");
+        query.bindValue(0, object.value(KEY_LOGIN).toString());
+        query.exec();
+
+        if (query.size() != 0)
+            return BoolValues::Incorrect;
+
+        query.prepare("UPDATE users SET "
+                      "login = ? "
+                      "WHERE id = ? ");
+        query.bindValue(0, object.value(KEY_LOGIN).toString());
+        query.bindValue(1, object.value(KEY_USER_ID).toString());
+
+        query.exec();
+        return BoolValues::True;
+
+    } catch (...) {
+        qDebug() << query.lastError();
+        return BoolValues::False;
+    }
+
+}
+
+const BoolValues Sql::changePassword(const QJsonObject& object)
+{
+    try {
+        query.prepare("SELECT * FROM users "
+                      "WHERE password = ? and id = ? ");
+        query.bindValue(0, object.value(KEY_OLD_PASSWORD).toString());
+        query.bindValue(1, object.value(KEY_USER_ID).toString());
+        query.exec();
+
+        if (query.size() == 0)
+            return BoolValues::Incorrect;
+
+        query.prepare("UPDATE users SET "
+                      "password = ? "
+                      "WHERE id = ? ");
+        query.bindValue(0, object.value(KEY_NEW_PASSWORD).toString());
+        query.bindValue(1, object.value(KEY_USER_ID).toString());
+
+        query.exec();
+        return BoolValues::True;
+
+    } catch (...) {
+        qDebug() << query.lastError();
+        return BoolValues::False;
+    }
+
+}
+
+const BoolValues Sql::deleteAccount(const QJsonObject& object)
+{
+    try {
+        query.prepare("SELECT * FROM users "
+                      "WHERE id = ? and password = ? ");
+        query.bindValue(0, object.value(KEY_USER_ID).toString());
+        query.bindValue(1, object.value(KEY_PASSWORD).toString());
+        query.exec();
+
+        if (query.size() != 0) {
+            query.prepare("DELETE FROM users "
+                          "WHERE id = ? ");
+            query.bindValue(0, object.value(KEY_USER_ID).toString());
+            return query.exec() ? BoolValues::True : BoolValues::False;
+        }
+        else
+            return BoolValues::Incorrect;
+    }
+    catch(...) {
+        qDebug() << query.lastError();
+        return BoolValues::False;
+    }
+}
+
 
 const bool Sql::addStatistic(const QJsonObject& object)
 {
-    query.prepare("SELECT * FROM statistics "
-                  "WHERE user_id = ? ");
-    query.bindValue(0, object.value(KEY_USER_ID).toString());
+    try {
+        query.prepare("SELECT * FROM statistics "
+                      "WHERE user_id = ? ");
+        query.bindValue(0, object.value(KEY_USER_ID).toString());
+        query.exec();
 
-    if (query.exec()) {
         if (query.size() != 0) {
             query.next();
             int count = query.value(4).toInt();
@@ -200,7 +311,7 @@ const bool Sql::addStatistic(const QJsonObject& object)
             query.bindValue(1, max_speed);
             query.bindValue(2, average_count_mistakes);
             query.bindValue(3, object.value(KEY_USER_ID).toString());
-            query.exec();
+            return query.exec();
         }
         else {
             qDebug() << "Inserting";
@@ -213,94 +324,64 @@ const bool Sql::addStatistic(const QJsonObject& object)
             query.bindValue(3, object.value(KEY_COUNT_MISTAKES).toString());
             query.bindValue(4, 1);
             query.bindValue(5, object.value(KEY_USER_ID).toString());
-            query.exec();
+            return query.exec();
         }
-        return true;
+
+    } catch(...) {
+        qDebug() << query.lastError();
+        return false;
     }
-    return false;
+
 }
-
-const DangerousValues Sql::changeUsername(const QJsonObject& object)
-{
-    query.prepare("SELECT * FROM users "
-                  "WHERE login = ? ");
-    query.bindValue(0, object.value(KEY_LOGIN).toString());
-
-    if (query.exec() && query.size() != 0)
-        return DangerousValues::Incorrect;
-
-    query.prepare("UPDATE users SET "
-                  "login = ? "
-                  "WHERE id = ? ");
-    query.bindValue(0, object.value(KEY_LOGIN).toString());
-    query.bindValue(1, object.value(KEY_USER_ID).toString());
-
-    return query.exec() ? DangerousValues::True : DangerousValues::False;
-}
-
-const bool Sql::changePassword(const QJsonObject& object)
-{
-    query.prepare("UPDATE users SET "
-                  "password = ? "
-                  "WHERE id = ? ");
-    query.bindValue(0, object.value(KEY_PASSWORD).toString());
-    query.bindValue(1, object.value(KEY_USER_ID).toString());
-
-    return query.exec();
-}
-
-const DangerousValues Sql::deleteAccount(const QJsonObject& object)
-{
-    query.prepare("SELECT * FROM users "
-                  "WHERE id = ? and password = ? ");
-    query.bindValue(0, object.value(KEY_USER_ID).toString());
-    query.bindValue(1, object.value(KEY_PASSWORD).toString());
-
-    if (query.exec() && query.size() != 0) {
-        query.prepare("DELETE FROM users "
-                      "WHERE id = ? ");
-        query.bindValue(0, object.value(KEY_USER_ID).toString());
-        return query.exec() ? DangerousValues::True : DangerousValues::False;
-    }
-    else
-        return DangerousValues::Incorrect;
-}
-
 
 const QJsonObject Sql::getProfileStat(const uint32_t id)
 {
-    query.prepare("SELECT statistics.average_speed, statistics.max_speed, users.login, users.date_registration FROM users "
-                  "JOIN statistics ON users.id = statistics.user_id and users.id = ? ");
-    query.bindValue(0, id);
+    try {
+        query.prepare("SELECT statistics.average_speed, statistics.max_speed, users.login, users.date_registration FROM users "
+                        "LEFT OUTER JOIN statistics ON users.id = statistics.user_id "
+                        "WHERE users.id = ? ");
+        qDebug() << id;
+        query.bindValue(0, id);
+        query.exec();
 
-    if (query.exec()) {
-        query.first();
-        return {
-            {KEY_LOGIN, query.value(2).toString()},
-            {KEY_DATE_REGISTRATION, query.value(3).toString()},
-            {KEY_AVERAGE_SPEED, query.value(0).toString()},
-            {KEY_MAX_SPEED, query.value(1).toString()}
-        };
+        if (query.size() != 0) {
+            query.first();
+            return {
+                {KEY_LOGIN, query.value(2).toString()},
+                {KEY_DATE_REGISTRATION, query.value(3).toString()},
+                {KEY_AVERAGE_SPEED, query.value(0).toString()},
+                {KEY_MAX_SPEED, query.value(1).toString()}
+            };
+        }
+        return {};
+
+    } catch(...) {
+        qDebug() << query.lastError();
+        return {};
     }
-
-    return {};
 }
 
+const void Sql::addText()
+{
+    query.exec("SELECT * FROM texts");
+    if (query.size() == 0) {
+        QFile file(":/data/parsText.json");
+        QString text;
+        file.open(QIODevice::ReadOnly);
+        text = file.readAll();
+        file.close();
+        for (int i = 0; i < 500; i++) {
+            auto obj = QJsonDocument::fromJson(text.toUtf8()).object().value("Text"+QString::number(i)).toObject();
+            if (!obj.isEmpty()) {
+                query.prepare("INSERT INTO texts (id, text, count_words) "
+                              "VALUES(?, ?, ?) ");
+                query.bindValue(0, obj.value(KEY_ID).toInt());
+                query.bindValue(1, obj.value(KEY_TEXT).toString());
+                query.bindValue(2, obj.value(KEY_COUNT_WORDS).toInt());
+                query.exec();
+            }
 
+        }
+    }
 
-
-//const QJsonObject Sql::addText()
-//{
-//    query.prepare("INSERT INTO texts (id, text, count_words) "
-//                  "VALUES (?, ?, ?)");
-//    query.bindValue(1, "eqweqw");
-//    query.bindValue(2, 1);
-//    if (query.exec())
-//        return {
-//            {RESPONSE_TEXT, RESPONSE_CODE_OK}
-//        };
-
-//    return {
-//        {RESPONSE_TEXT, RESPONSE_CODE_BAD}
-//    };
-//}
+}

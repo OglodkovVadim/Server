@@ -11,6 +11,10 @@
 #include <QSqlRecord>
 #include <QRandomGenerator>
 #include <QDate>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QFile>
 
 class Sql : protected User, protected Text
 {
@@ -30,15 +34,15 @@ public:
     const QJsonObject generateText(QSqlQuery&, const quint32);
     const QJsonObject generateWords(QSqlQuery&, const quint32);
 
-    const bool addUser(const QJsonObject&);
-    const bool findUser(const QJsonObject&);
+    const Auth addUser(const QJsonObject&);
+    const Auth findUser(const QJsonObject&);
 
-    const bool addText();
+    const void addText();
     const bool addStatistic(const QJsonObject&);
 
-    const DangerousValues changeUsername(const QJsonObject&);
-    const bool changePassword(const QJsonObject&);
-    const DangerousValues deleteAccount(const QJsonObject&);
+    const BoolValues changeUsername(const QJsonObject&);
+    const BoolValues changePassword(const QJsonObject&);
+    const BoolValues deleteAccount(const QJsonObject&);
 
     const QJsonObject getProfileStat(const uint32_t id);
 

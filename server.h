@@ -26,7 +26,7 @@
 #define METHOD_DELETE QHttpServerRequest::Method::Delete
 
 #define DEFAULT_TEXT_TYPE "text"
-#define DEFAULT_TEXT_SIZE 20
+#define DEFAULT_TEXT_SIZE 50
 
 class Server
 {
@@ -45,9 +45,14 @@ public:
     void routeSettingsPassword(Sql&);
     void routeSettingsDelete(Sql&);
 
+    QJsonObject wrong_passord {
+        {RESPONSE_MESSAGE, "Inncorrect login or password"}
+    };
+
+
 private:
     quint16 port;
-    QSharedPointer<QHttpServer> httpServer;
+    QSharedPointer<QHttpServer> httpServer; 
 };
 
 #endif // SERVER_H

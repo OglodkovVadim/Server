@@ -12,7 +12,6 @@ Server::Server()
     httpServer = QSharedPointer<QHttpServer>(new QHttpServer());
 }
 
-
 bool Server::init()
 {
     return httpServer->listen(QHostAddress::Any, port);
@@ -25,27 +24,28 @@ const TextType getTextType(const QString& str)
 }
 
 
-
 void Server::routeHome(Sql& sql) // Get -> (get text)   Post -> (insert statistic)
 {
 
     httpServer->route(ROUTE_HOME, [&sql](const QHttpServerRequest &request) {
         switch(request.method()) {
         case METHOD_GET:
-            if (request.query().isEmpty())
-                return QHttpServerResponse(
-                    sql.getRandomText(getTextType(DEFAULT_TEXT_TYPE),
-                                      DEFAULT_TEXT_SIZE),
-                    QHttpServerResponder::StatusCode::Ok);
-            else
-                return QHttpServerResponse(
-                    sql.getRandomText (getTextType(
-                        request.query().queryItems().at(0).second),
-                        request.query().queryItems().at(1).second.toInt()),
-                    QHttpServerResponder::StatusCode::Ok);
+            if (request.query().isEmpty()) {
+                QJsonObject obj = sql.getRandomText(getTextType(DEFAULT_TEXT_TYPE),
+                                                    DEFAULT_TEXT_SIZE);
+                return obj.isEmpty() ?
+                        QHttpServerResponse(QHttpServerResponse::StatusCode::InternalServerError) :
+                        QHttpServerResponse(obj);
+            }
+            else {
+                QJsonObject obj = sql.getRandomText(getTextType(request.query().queryItems().at(0).second),
+                                                    request.query().queryItems().at(1).second.toInt());
+                return obj.isEmpty() ?
+                        QHttpServerResponse(QHttpServerResponse::StatusCode::InternalServerError) :
+                        QHttpServerResponse(obj);
+            }
 
         case METHOD_POST:
-            qDebug() << "Post";
             return sql.addStatistic(QJsonDocument::fromJson(request.body().data()).object()) ?
                        QHttpServerResponse(QHttpServerResponse::StatusCode::Ok) :
                        QHttpServerResponse(QHttpServerResponse::StatusCode::InternalServerError);
@@ -59,11 +59,18 @@ void Server::routeHome(Sql& sql) // Get -> (get text)   Post -> (insert statisti
 void Server::routeSignIn(Sql& sql) // ??? Get/Post -> ()
 {
     httpServer->route(ROUTE_SIGNIN, [&sql](const QHttpServerRequest &request) {
+        Auth auth;
         switch (request.method()) {
         case METHOD_POST:
-            return sql.findUser(QJsonDocument::fromJson(request.body().data()).object()) ?
-                       QHttpServerResponse(QHttpServerResponse::StatusCode::Ok) :
-                       QHttpServerResponse(QHttpServerResponse::StatusCode::InternalServerError);
+            auth = sql.findUser(QJsonDocument::fromJson(request.body().data()).object());
+            switch(auth.bool_values) {
+            case BoolValues::True:
+                return QHttpServerResponse(QJsonObject({{KEY_USER_ID, int(auth.id)}}));
+            case BoolValues::Incorrect:
+                return QHttpServerResponse(QHttpServerResponse::StatusCode::NotImplemented);
+            default:
+                return QHttpServerResponse(QHttpServerResponse::StatusCode::InternalServerError);
+            }
         default:
             return QHttpServerResponse(QHttpServerResponse::StatusCode::InternalServerError);
         }
@@ -73,11 +80,18 @@ void Server::routeSignIn(Sql& sql) // ??? Get/Post -> ()
 void Server::routeSignUp(Sql&  sql) // Post -> (insert User)
 {
     httpServer->route(ROUTE_SIGNUP, [&sql](const QHttpServerRequest &request) {
+        Auth auth;
         switch (request.method()) {
         case METHOD_POST:
-            return sql.addUser(QJsonDocument::fromJson(request.body().data()).object()) ?
-                       QHttpServerResponse(QHttpServerResponse::StatusCode::Ok) :
-                       QHttpServerResponse(QHttpServerResponse::StatusCode::InternalServerError);
+            auth = sql.addUser(QJsonDocument::fromJson(request.body().data()).object());
+            switch(auth.bool_values) {
+            case BoolValues::True:
+                return QHttpServerResponse(QJsonObject({{KEY_USER_ID, int(auth.id)}}));
+            case BoolValues::Incorrect:
+                return QHttpServerResponse(QHttpServerResponse::StatusCode::NotImplemented);
+            default:
+                return QHttpServerResponse(QHttpServerResponse::StatusCode::InternalServerError);
+            }
         default:
             return QHttpServerResponse(QHttpServerResponse::StatusCode::InternalServerError);
         }
@@ -91,12 +105,12 @@ void Server::routeSettingsUsername(Sql& sql)
         switch (request.method()) {
         case METHOD_POST:
             switch(sql.changeUsername(QJsonDocument::fromJson(request.body().data()).object())) {
-            case DangerousValues::True:
+            case BoolValues::True:
                 return QHttpServerResponse(QHttpServerResponse::StatusCode::Ok);
-            case DangerousValues::False:
+            case BoolValues::Incorrect:
+                return QHttpServerResponse(QHttpServerResponse::StatusCode::NotImplemented);
+            default:
                 return QHttpServerResponse(QHttpServerResponse::StatusCode::InternalServerError);
-            case DangerousValues::Incorrect:
-                return QHttpServerResponse(QHttpServerResponse::StatusCode::Continue);
             }
 
         default:
@@ -110,9 +124,14 @@ void Server::routeSettingsPassword(Sql& sql)
     httpServer->route(ROUTE_SETTINGS_PASSWORD, [&sql](const QHttpServerRequest &request) {
         switch (request.method()) {
         case METHOD_POST:
-            return sql.changePassword(QJsonDocument::fromJson(request.body().data()).object()) ?
-                       QHttpServerResponse(QHttpServerResponse::StatusCode::Ok) :
-                       QHttpServerResponse(QHttpServerResponse::StatusCode::InternalServerError);
+            switch(sql.changePassword(QJsonDocument::fromJson(request.body().data()).object())) {
+            case BoolValues::True:
+                return QHttpServerResponse(QHttpServerResponse::StatusCode::Ok);
+            case BoolValues::Incorrect:
+                return QHttpServerResponse(QHttpServerResponse::StatusCode::NotImplemented);
+            default:
+                return QHttpServerResponse(QHttpServerResponse::StatusCode::InternalServerError);
+            }
         default:
             return QHttpServerResponse(QHttpServerResponse::StatusCode::InternalServerError);
         }
@@ -125,12 +144,12 @@ void Server::routeSettingsDelete(Sql& sql)
         switch (request.method()) {
         case METHOD_DELETE:
             switch(sql.deleteAccount(QJsonDocument::fromJson(request.body().data()).object())) {
-            case DangerousValues::True:
+            case BoolValues::True:
                 return QHttpServerResponse(QHttpServerResponse::StatusCode::Ok);
-            case DangerousValues::False:
+            case BoolValues::Incorrect:
+                return QHttpServerResponse(QHttpServerResponse::StatusCode::NotImplemented);
+            default:
                 return QHttpServerResponse(QHttpServerResponse::StatusCode::InternalServerError);
-            case DangerousValues::Incorrect:
-                return QHttpServerResponse(QHttpServerResponse::StatusCode::Continue);
             }
         default:
             return QHttpServerResponse(QHttpServerResponse::StatusCode::InternalServerError);
@@ -142,18 +161,16 @@ void Server::routeSettingsDelete(Sql& sql)
 void Server::routeProfile(Sql& sql) // Get -> (get Profile + get stat)
 {
     httpServer->route(ROUTE_PROFILE, [&sql](const QHttpServerRequest &request) {
+        QJsonObject obj;
         switch (request.method()) {
         case METHOD_GET:
-            return QHttpServerResponse(sql.getProfileStat(request.query().queryItems().at(0).second.toInt()));
+            obj = sql.getProfileStat(request.query().queryItems().at(0).second.toInt());
+            return obj.isEmpty() ?
+                QHttpServerResponse(QHttpServerResponse::StatusCode::InternalServerError) :
+                QHttpServerResponse(obj);
         default:
             return QHttpServerResponse(QHttpServerResponse::StatusCode::InternalServerError);
         }
     });
 }
 
-
-
-void Server::routeStatistic(Sql& sql) // Get -> (get statistics)
-{
-
-}
