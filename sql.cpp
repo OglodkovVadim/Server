@@ -73,7 +73,15 @@ void Sql::createTables()
 
         // create table for texts (list of all texts)
         query.exec(
-            "CREATE TABLE IF NOT EXISTS texts ("
+            "CREATE TABLE IF NOT EXISTS ru_texts ("
+            "id BIGINT PRIMARY KEY,"
+            "text TEXT NOT NULL,"
+            "count_words INT NOT NULL"
+            ")"
+            );
+
+        query.exec(
+            "CREATE TABLE IF NOT EXISTS en_texts ("
             "id BIGINT PRIMARY KEY,"
             "text TEXT NOT NULL,"
             "count_words INT NOT NULL"
@@ -81,7 +89,8 @@ void Sql::createTables()
             );
 
         // create table for words (list of words)
-        query.exec("CREATE TABLE IF NOT EXISTS words (text TEXT NOT NULL)");
+        query.exec("CREATE TABLE IF NOT EXISTS ru_words (text TEXT NOT NULL)");
+        query.exec("CREATE TABLE IF NOT EXISTS en_words (text TEXT NOT NULL)");
 
     } catch (...) {
         qDebug() << sql_database.lastError();
@@ -146,10 +155,19 @@ const Auth Sql::findUser(const QJsonObject& object)
 }
 
 
-const QJsonObject Sql::generateText(QSqlQuery& query, const quint32 count_words) {
+const QJsonObject Sql::generateText(const Language lang, const quint32 count_words) {
     try {
-        query.prepare("SELECT * FROM texts "
-                      "WHERE count_words = ?");
+        switch(lang) {
+        case Language::ru:
+            query.prepare("SELECT * FROM ru_texts "
+                          "WHERE count_words = ?");
+            break;
+        default:
+            query.prepare("SELECT * FROM en_texts "
+                          "WHERE count_words = ?");
+            break;
+        }
+
         query.bindValue(0, count_words);
         query.exec();
 
@@ -160,43 +178,53 @@ const QJsonObject Sql::generateText(QSqlQuery& query, const quint32 count_words)
             {KEY_TEXT, query.value(1).toString()}
         };
 
+
     } catch(...) {
         qDebug() << query.lastError();
         return {};
     }
 }
 
-const QJsonObject Sql::generateWords(QSqlQuery& query, const quint32 count_words) {
+const QJsonObject Sql::generateWords(const Language lang, const quint32 count_words) {
     try {
-        query.exec("SELECT * FROM words");
+        switch(lang) {
+        case Language::ru:
+            query.exec("SELECT * FROM ru_words ");
+            break;
+        default:
+            query.exec("SELECT * FROM en_words ");
+            break;
+        }
         query.first();
         QStringList all_words = query.value(0).toString().split("\n");
         QString text;
         for (int i = 0; i < count_words; i++) {
             text += all_words[QRandomGenerator::global()->bounded(1, all_words.size())] + " ";
         }
+        text.replace("\r", "");
         return {
-            {KEY_WORDS, text}
+            {KEY_WORDS, text.sliced(0, text.size()-1)}
         };
 
     } catch(...) {
-        qDebug() << query.lastError();
+        throw query.lastError().text();
         return {};
     }
 }
 
-const QJsonObject Sql::getRandomText(const TextType type, const quint32 count_words)
+const QJsonObject Sql::getRandomText(const Language lang, const TextType type, const quint32 count_words)
 {
     try {
         switch(type) {
         case TextType::text:
-            return generateText(query, count_words);
+            return generateText(lang, count_words);
         case TextType::words:
-            return generateWords(query, count_words);
+            return generateWords(lang, count_words);
         }
     }
-    catch(...) {
-
+    catch(std::exception e) {
+        qDebug() << e.what();
+        return {};
     }
 }
 
@@ -206,11 +234,20 @@ const BoolValues Sql::changeUsername(const QJsonObject& object)
 {
     try {
         query.prepare("SELECT * FROM users "
-                      "WHERE login = ? ");
+                      "WHERE login = ?");
         query.bindValue(0, object.value(KEY_LOGIN).toString());
         query.exec();
 
         if (query.size() != 0)
+            return BoolValues::Incorrect;
+
+        query.prepare("SELECT * FROM users "
+                      "WHERE id = ? and password = ?");
+        query.bindValue(0, object.value(KEY_USER_ID).toString());
+        query.bindValue(1, object.value(KEY_PASSWORD).toString());
+        query.exec();
+
+        if (query.size() == 0)
             return BoolValues::Incorrect;
 
         query.prepare("UPDATE users SET "
@@ -361,27 +398,63 @@ const QJsonObject Sql::getProfileStat(const uint32_t id)
     }
 }
 
-const void Sql::addText()
+const void Sql::addText(const Language lang)
 {
-    query.exec("SELECT * FROM texts");
-    if (query.size() == 0) {
-        QFile file(":/data/parsText.json");
-        QString text;
-        file.open(QIODevice::ReadOnly);
-        text = file.readAll();
-        file.close();
-        for (int i = 0; i < 500; i++) {
-            auto obj = QJsonDocument::fromJson(text.toUtf8()).object().value("Text"+QString::number(i)).toObject();
-            if (!obj.isEmpty()) {
-                query.prepare("INSERT INTO texts (id, text, count_words) "
-                              "VALUES(?, ?, ?) ");
-                query.bindValue(0, obj.value(KEY_ID).toInt());
-                query.bindValue(1, obj.value(KEY_TEXT).toString());
-                query.bindValue(2, obj.value(KEY_COUNT_WORDS).toInt());
-                query.exec();
-            }
+    QFile file;
+    QString text;
+    QString ru_en_texts;
 
-        }
+    switch(lang) {
+    case Language::ru:
+        ru_en_texts = "ru_texts";
+        break;
+    default:
+        ru_en_texts = "en_texts";
+        break;
     }
 
+    query.exec("DELETE FROM " + ru_en_texts);
+    file.setFileName(":/data/" + ru_en_texts + ".json");
+    file.open(QIODevice::ReadOnly);
+    text = file.readAll();
+    file.close();
+    for (int i = 0; i < 10000; i++) {
+        auto obj = QJsonDocument::fromJson(text.toUtf8()).object().value("Text"+QString::number(i)).toObject();
+        if (!obj.isEmpty()) {
+            query.prepare("INSERT INTO " + ru_en_texts + " (id, text, count_words) "
+                          "VALUES(?, ?, ?) ");
+            query.bindValue(0, obj.value(KEY_ID).toInt());
+            query.bindValue(1, obj.value(KEY_TEXT).toString());
+            query.bindValue(2, obj.value(KEY_COUNT_WORDS).toInt());
+            query.exec();
+        }
+
+    }
+}
+
+const void Sql::addWords(const Language lang)
+{
+    QFile file;
+    QString text;
+    QString ru_en_words;
+
+    switch(lang) {
+    case Language::ru:
+        ru_en_words = "ru_words";
+        break;
+    default:
+        ru_en_words = "en_words";
+        break;
+    }
+
+    query.exec("DELETE FROM " + ru_en_words);
+    file.setFileName(":/data/" + ru_en_words + ".txt");
+    file.open(QIODevice::ReadOnly);
+    text = file.readAll();
+    file.close();
+
+    query.prepare("INSERT INTO " + ru_en_words + " (text) "
+                                                 "VALUES(?) ");
+    query.bindValue(0, text);
+    query.exec();
 }

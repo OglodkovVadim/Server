@@ -30,14 +30,15 @@ public:
 
     void createTables();
 
-    const QJsonObject getRandomText(const TextType, const quint32);
-    const QJsonObject generateText(QSqlQuery&, const quint32);
-    const QJsonObject generateWords(QSqlQuery&, const quint32);
+    const QJsonObject getRandomText(const Language, const TextType, const quint32);
+    const QJsonObject generateText(const Language, const quint32);
+    const QJsonObject generateWords(const Language, const quint32);
 
     const Auth addUser(const QJsonObject&);
     const Auth findUser(const QJsonObject&);
 
-    const void addText();
+    const void addText(const Language);
+    const void addWords(const Language);
     const bool addStatistic(const QJsonObject&);
 
     const BoolValues changeUsername(const QJsonObject&);

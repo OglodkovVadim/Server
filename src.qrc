@@ -1,5 +1,8 @@
 <RCC>
     <qresource prefix="/data">
-        <file>parsText.json</file>
+        <file>en_texts.json</file>
+        <file>ru_texts.json</file>
+        <file>en_words.txt</file>
+        <file>ru_words.txt</file>
     </qresource>
 </RCC>

@@ -44,6 +44,12 @@ enum class BoolValues {
     Incorrect
 };
 
+enum class Language {
+    ru,
+    en
+};
+
+
 struct Auth {
     BoolValues bool_values = BoolValues::False;
     uint32_t id = 0;

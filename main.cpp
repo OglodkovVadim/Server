@@ -41,7 +41,12 @@ int main(int argc, char *argv[])
     server.init();
     sql.init(hostName, userName, password, port);
     sql.createTables();
-    sql.addText();
+
+    sql.addText(Language::ru);
+    sql.addText(Language::en);
+    sql.addWords(Language::ru);
+    sql.addWords(Language::en);
+
     server.routeHome(sql);
     server.routeSignIn(sql);
     server.routeSignUp(sql);

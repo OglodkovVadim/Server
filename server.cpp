@@ -23,6 +23,11 @@ const TextType getTextType(const QString& str)
     return str == "text" ? TextType::text : TextType::words;
 }
 
+const Language getLanguage(const QString& str)
+{
+    return str == "ru" ? Language::ru : Language::en;
+}
+
 
 void Server::routeHome(Sql& sql) // Get -> (get text)   Post -> (insert statistic)
 {
@@ -31,15 +36,16 @@ void Server::routeHome(Sql& sql) // Get -> (get text)   Post -> (insert statisti
         switch(request.method()) {
         case METHOD_GET:
             if (request.query().isEmpty()) {
-                QJsonObject obj = sql.getRandomText(getTextType(DEFAULT_TEXT_TYPE),
+                QJsonObject obj = sql.getRandomText(Language::ru, getTextType(DEFAULT_TEXT_TYPE),
                                                     DEFAULT_TEXT_SIZE);
                 return obj.isEmpty() ?
                         QHttpServerResponse(QHttpServerResponse::StatusCode::InternalServerError) :
                         QHttpServerResponse(obj);
             }
             else {
-                QJsonObject obj = sql.getRandomText(getTextType(request.query().queryItems().at(0).second),
-                                                    request.query().queryItems().at(1).second.toInt());
+                QJsonObject obj = sql.getRandomText(getLanguage(request.query().queryItems().at(0).second),
+                                                    getTextType(request.query().queryItems().at(1).second),
+                                                    request.query().queryItems().at(2).second.toInt());
                 return obj.isEmpty() ?
                         QHttpServerResponse(QHttpServerResponse::StatusCode::InternalServerError) :
                         QHttpServerResponse(obj);
