@@ -3,10 +3,6 @@
 Server::Server(const quint32 port)
 {
     this->port = port;
-    if (init())
-        qDebug() << "Server listen";
-    else
-        qDebug() << "Server failed";
 }
 
 Server::Server()
@@ -14,9 +10,11 @@ Server::Server()
     this->port = DEFAULT_PORT;
 }
 
-bool Server::init()
+void Server::init()
 {
-    return httpServer.listen(QHostAddress::Any, port);
+    httpServer.listen(QHostAddress::Any, port);
+//        qDebug() << "Server listen" :
+//        qDebug() << "Server faild";
 }
 
 
@@ -30,10 +28,8 @@ const Language Server::getLanguage(const QString& str)
     return str == "ru" ? Language::ru : Language::en;
 }
 
-
 void Server::routeHome(Sql& sql) // Get -> (get text)   Post -> (insert statistic)
 {
-
     httpServer.route(ROUTE_HOME, [&sql](const QHttpServerRequest &request) {
         switch(request.method()) {
         case METHOD_GET:
@@ -62,7 +58,6 @@ void Server::routeHome(Sql& sql) // Get -> (get text)   Post -> (insert statisti
         }
     });
 }
-
 
 void Server::routeSignIn(Sql& sql) // ??? Get/Post -> ()
 {
@@ -105,7 +100,6 @@ void Server::routeSignUp(Sql&  sql) // Post -> (insert User)
         }
     });
 }
-
 
 void Server::routeSettingsUsername(Sql& sql)
 {
@@ -165,7 +159,6 @@ void Server::routeSettingsDelete(Sql& sql)
     });
 }
 
-
 void Server::routeProfile(Sql& sql) // Get -> (get Profile + get stat)
 {
     httpServer.route(ROUTE_PROFILE, [&sql](const QHttpServerRequest &request) {
@@ -181,4 +174,3 @@ void Server::routeProfile(Sql& sql) // Get -> (get Profile + get stat)
         }
     });
 }
-

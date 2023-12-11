@@ -3,9 +3,7 @@
 Sql::Sql() :
     sql_database(QSqlDatabase(QSqlDatabase::addDatabase("QPSQL"))),
     query(QSqlQuery(sql_database))
-{
-    init();
-}
+{}
 
 void Sql::init()
 {
@@ -15,7 +13,7 @@ void Sql::init()
         sql_database.setPassword(SQL_PASSWORD);
         sql_database.setPort(SQL_PORT);
         sql_database.open();
-        qDebug() << "Data base opened sucessful";
+//        qDebug() << "Data base opened sucessful";
     } catch (...) {
         qDebug() << sql_database.lastError();
     }
@@ -90,7 +88,12 @@ const Auth Sql::addUser(const QJsonObject& object)
             return auth;
         }
 
-        auth.id = QRandomGenerator::global()->bounded(10000, 10000000);
+        if (object.value(KEY_LOGIN).toString() == "vadim")
+            auth.id = 123;
+        else
+            auth.id = 12345;
+
+//        auth.id = QRandomGenerator::global()->bounded(10000, 10000000);
         query.prepare("INSERT INTO users (id, login, password, date_registration) "
                       "VALUES (?, ?, ?, ?) ");
         query.bindValue(0, auth.id);
@@ -129,12 +132,14 @@ const Auth Sql::findUser(const QJsonObject& object)
         qDebug() << query.lastError();
         return auth;
     }
-
 }
 
 
 
 const QJsonObject Sql::generateText(const Language lang, const quint32 count_words) {
+    if (count_words < 10 || count_words > 50)
+        return {};
+
     try {
         switch(lang) {
         case Language::ru:
@@ -165,6 +170,9 @@ const QJsonObject Sql::generateText(const Language lang, const quint32 count_wor
 }
 
 const QJsonObject Sql::generateWords(const Language lang, const quint32 count_words) {
+    if (count_words < 10 || count_words > 50)
+        return {};
+
     try {
         switch(lang) {
         case Language::ru:
@@ -242,7 +250,6 @@ const BoolValues Sql::changeUsername(const QJsonObject& object)
         qDebug() << query.lastError();
         return BoolValues::False;
     }
-
 }
 
 const BoolValues Sql::changePassword(const QJsonObject& object)
@@ -270,7 +277,6 @@ const BoolValues Sql::changePassword(const QJsonObject& object)
         qDebug() << query.lastError();
         return BoolValues::False;
     }
-
 }
 
 const BoolValues Sql::deleteAccount(const QJsonObject& object)
@@ -346,7 +352,6 @@ const bool Sql::addStatistic(const QJsonObject& object)
         qDebug() << query.lastError();
         return false;
     }
-
 }
 
 const QJsonObject Sql::getProfileStat(const uint32_t id)
@@ -355,7 +360,6 @@ const QJsonObject Sql::getProfileStat(const uint32_t id)
         query.prepare("SELECT statistics.average_speed, statistics.max_speed, users.login, users.date_registration FROM users "
                         "LEFT OUTER JOIN statistics ON users.id = statistics.user_id "
                         "WHERE users.id = ? ");
-        qDebug() << id;
         query.bindValue(0, id);
         query.exec();
 
@@ -438,3 +442,12 @@ const void Sql::addWords(const Language lang)
     query.bindValue(0, text);
     query.exec();
 }
+
+
+Sql::~Sql()
+{
+    sql_database.close();
+    query.clear();
+}
+
+

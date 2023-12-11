@@ -13,6 +13,9 @@ class BackendTest : public QObject
 public:
     explicit BackendTest(QObject *parent = nullptr);
 
+    Server server;
+    Sql sql;
+
 private slots:
     void test_getTypeText();
 
@@ -26,11 +29,16 @@ private slots:
 
     void test_getProfileStat();
 
-//    void test_changeUsername();
+    void test_changeUsername();
 
-//    void test_changePassword();
+    void test_changePassword();
 
-//    void test_deleteAccount();
+    void test_deleteAccount();
+
+    void test_generateText();
+
+    void test_generateWords();
+
 
 signals:
 

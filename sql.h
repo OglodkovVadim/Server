@@ -45,7 +45,7 @@ public:
 
     const QJsonObject getProfileStat(const uint32_t id);
 
-
+    ~Sql();
 
 private:
     QSqlDatabase sql_database;

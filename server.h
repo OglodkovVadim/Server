@@ -32,7 +32,7 @@ public:
     Server();
     Server(const quint32);
 
-    bool init ();
+    void init ();
 
     void routeHome(Sql&);
     void routeSignIn(Sql&);

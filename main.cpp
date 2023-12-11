@@ -20,12 +20,7 @@
 #define KEY_PASSWORD "password"
 #define KEY_SOLVED_TEXTS "solvedTexts"
 
-#include "sql.h"
-#include "server.h"
 #include "backendtest.h"
-
-
-
 
 using namespace Qt::StringLiterals;
 
@@ -34,24 +29,26 @@ int main(int argc, char *argv[])
     QCoreApplication app(argc, argv);
 
     QTest::qExec(new BackendTest);
+//    Server server;
+//    Sql sql;
 
-    Server server;
-    Sql sql;
+//    server.init();
+//    sql.init();
 
-    sql.createTables();
+//    sql.createTables();
 
-    sql.addText(Language::ru);
-    sql.addText(Language::en);
-    sql.addWords(Language::ru);
-    sql.addWords(Language::en);
+//    sql.addText(Language::ru);
+//    sql.addText(Language::en);
+//    sql.addWords(Language::ru);
+//    sql.addWords(Language::en);
 
-    server.routeHome(sql);
-    server.routeSignIn(sql);
-    server.routeSignUp(sql);
-    server.routeProfile(sql);
-    server.routeSettingsUsername(sql);
-    server.routeSettingsPassword(sql);
-    server.routeSettingsDelete(sql);
+//    server.routeHome(sql);
+//    server.routeSignIn(sql);
+//    server.routeSignUp(sql);
+//    server.routeProfile(sql);
+//    server.routeSettingsUsername(sql);
+//    server.routeSettingsPassword(sql);
+//    server.routeSettingsDelete(sql);
 
     return app.exec();
 }
