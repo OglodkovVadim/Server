@@ -34,6 +34,7 @@ int main(int argc, char *argv[])
 
 //    server.init();
 //    sql.init();
+//    sql.clenUpDB();
 
 //    sql.createTables();
 

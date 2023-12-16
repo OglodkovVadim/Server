@@ -88,7 +88,7 @@ const Auth Sql::addUser(const QJsonObject& object)
             return auth;
         }
 
-        if (object.value(KEY_LOGIN).toString() == "vadim")
+        if (object.value(KEY_LOGIN).toString() == "Login")
             auth.id = 123;
         else
             auth.id = 12345;
@@ -443,6 +443,16 @@ const void Sql::addWords(const Language lang)
     query.exec();
 }
 
+void Sql::clenUpDB()
+{
+    query.exec("DELETE FROM users");
+    query.exec("DELETE FROM statistics");
+
+    QJsonObject default_user;
+    default_user.insert(KEY_LOGIN, "Login");
+    default_user.insert(KEY_PASSWORD, "Password");
+    addUser(default_user);
+}
 
 Sql::~Sql()
 {

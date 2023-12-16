@@ -13,7 +13,6 @@ class BackendTest : public QObject
 public:
     explicit BackendTest(QObject *parent = nullptr);
 
-    Server server;
     Sql sql;
 
 private slots:
@@ -39,6 +38,7 @@ private slots:
 
     void test_generateWords();
 
+    void cleanUp();
 
 signals:
 

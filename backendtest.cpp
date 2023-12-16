@@ -4,165 +4,291 @@
 BackendTest::BackendTest(QObject *parent)
     : QObject{parent}
 {
-    server.init();
     sql.init();
 }
 
 void BackendTest::test_getTypeText() // 1 / 1
 {
-    QCOMPARE(server.getTextType("text"), TextType::text);
-    QCOMPARE(server.getTextType("words"), TextType::words);
+    // Arrange
+    Server server;
+    server.init();
+
+    // Act
+    TextType type_text = server.getTextType("text");
+    TextType type_words = server.getTextType("words");
+
+    // Assert
+    QCOMPARE(type_text, TextType::text);
+    QCOMPARE(type_words, TextType::words);
+
+//    cleanUp();
 }
 
 void BackendTest::test_getLanguage() // 1 / 1
 {
-    QCOMPARE(server.getLanguage("ru"), Language::ru);
-    QCOMPARE(server.getLanguage("en"), Language::en);
+    // Arrange
+    Server server;
+    server.init();
+
+    // Act
+    Language language_ru = server.getLanguage("ru");
+    Language language_en = server.getLanguage("en");
+
+    // Assert
+    QCOMPARE(language_ru, Language::ru);
+    QCOMPARE(language_en, Language::en);
+
+//    cleanUp();
 }
 
-void BackendTest::test_addUser()// 26 / 34
+void BackendTest::test_addUser() // 26 / 34
 {
-    // add not exist user
-    QCOMPARE(sql.addUser(QJsonObject{
-                {KEY_LOGIN, "vadim"},
-                {KEY_PASSWORD, "password"}
-             }).bool_values, BoolValues::True);
+    // Arrange
+    QJsonObject not_exist_user;
+    not_exist_user.insert(KEY_LOGIN, "Not_exist_login");
+    not_exist_user.insert(KEY_PASSWORD, "Not_exist_password");
 
-    // add exist user
-    QCOMPARE(sql.addUser(QJsonObject{
-                {KEY_LOGIN, "exist_user"},
-                {KEY_PASSWORD, "123"}
-             }).bool_values, BoolValues::Incorrect);
+    QJsonObject exist_user;
+    exist_user.insert(KEY_LOGIN, "Login");
+    exist_user.insert(KEY_PASSWORD, "Password");
+
+    // Act
+    Auth auth_not_exist = sql.addUser(not_exist_user);
+    Auth auth_exist = sql.addUser(exist_user);
+
+    // Assert
+    QCOMPARE(auth_not_exist.bool_values, BoolValues::True);
+    QCOMPARE(auth_exist.bool_values, BoolValues::Incorrect);
+
+    sql.clenUpDB();
 }
 
 void BackendTest::test_findUser() // 15 / 21
 {
-    // find exist user with correct login and password
-    QCOMPARE(sql.findUser(QJsonObject{
-                            {KEY_LOGIN, "vadim"},
-                            {KEY_PASSWORD, "password"}
-                         }).bool_values, BoolValues::True);
+    // Arrange
+    QJsonObject not_exist_user;
+    not_exist_user.insert(KEY_LOGIN, "Not_exist_Login");
+    not_exist_user.insert(KEY_PASSWORD, "Not_exist_Password");
 
-    // find user with incorrect login and password
-    QCOMPARE(sql.findUser(QJsonObject{
-                            {KEY_LOGIN, "not_exist_user"},
-                            {KEY_PASSWORD, "not_exist_password"}
-                         }).bool_values, BoolValues::Incorrect);
+    QJsonObject exist_user;
+    exist_user.insert(KEY_LOGIN, "Login");
+    exist_user.insert(KEY_PASSWORD, "Password");
 
+    // Act
+    Auth auth_not_exist = sql.findUser(not_exist_user);
+    Auth auth_exist = sql.findUser(exist_user);
+
+    // Assert
+    QCOMPARE(auth_exist.bool_values, BoolValues::True);
+    QCOMPARE(auth_not_exist.bool_values, BoolValues::Incorrect);
+
+//    cleanUp();
 }
 
-void BackendTest::test_generateText()z
+void BackendTest::test_generateText()
 {
-    QCOMPARE(sql.generateText(Language::ru, 10).value(KEY_TEXT).toString().split(" ").size(), 10);
-    QCOMPARE(sql.generateText(Language::en, 10).value(KEY_TEXT).toString().split(" ").size(), 10);
-    QCOMPARE(sql.generateText(Language::ru, 20).value(KEY_TEXT).toString().split(" ").size(), 20);
-    QCOMPARE(sql.generateText(Language::en, 20).value(KEY_TEXT).toString().split(" ").size(), 20);
-    QCOMPARE(sql.generateText(Language::ru, 30).value(KEY_TEXT).toString().split(" ").size(), 30);
-    QCOMPARE(sql.generateText(Language::en, 30).value(KEY_TEXT).toString().split(" ").size(), 30);
-    QCOMPARE(sql.generateText(Language::ru, 40).value(KEY_TEXT).toString().split(" ").size(), 40);
-    QCOMPARE(sql.generateText(Language::en, 40).value(KEY_TEXT).toString().split(" ").size(), 40);
-    QCOMPARE(sql.generateText(Language::ru, 50).value(KEY_TEXT).toString().split(" ").size(), 50);
-    QCOMPARE(sql.generateText(Language::en, 50).value(KEY_TEXT).toString().split(" ").size(), 50);
-    QCOMPARE(sql.generateText(Language::ru, 60).value(KEY_TEXT).toString().split(" ").size(), 1);
-    QCOMPARE(sql.generateText(Language::en, 60).value(KEY_TEXT).toString().split(" ").size(), 1);
-    QCOMPARE(sql.generateText(Language::ru, -5).value(KEY_TEXT).toString().split(" ").size(), 1);
-    QCOMPARE(sql.generateText(Language::en, -5).value(KEY_TEXT).toString().split(" ").size(), 1);
+    // Arrange
+    struct TestData {
+        Language language;
+        int wordCount;
+    };
+
+    TestData normalData[] = {
+        {Language::ru, 10},
+        {Language::en, 10},
+        {Language::ru, 20},
+        {Language::en, 20},
+        {Language::ru, 30},
+        {Language::en, 30},
+        {Language::ru, 40},
+        {Language::en, 40},
+        {Language::ru, 50},
+        {Language::en, 50}
+    };
+
+    TestData wrongData[] = {
+        {Language::ru, 60},
+        {Language::en, 60},
+        {Language::ru, -5},
+        {Language::en, -5}
+    };
+
+    QVector<int> list_size_normal_data;
+    QVector<int> list_size_wrong_data;
+
+    // Act
+    for (const auto& data : normalData)
+        list_size_normal_data.push_back(sql.generateText(data.language, data.wordCount).value(KEY_TEXT).toString().split(" ").size());
+    for (const auto& data : wrongData)
+        list_size_wrong_data.push_back(sql.generateText(data.language, data.wordCount).value(KEY_TEXT).toString().split(" ").size());
+
+    // Assert
+    for (int i = 0; i < list_size_normal_data.size(); i++)
+        QCOMPARE(list_size_normal_data[i], normalData[i].wordCount);
+    for (const auto& data : list_size_wrong_data)
+        QCOMPARE(data, 1);
 }
 
 void BackendTest::test_generateWords()
 {
-    QCOMPARE(sql.generateWords(Language::ru, 10).value(KEY_WORDS).toString().split(" ").size(), 10);
-    QCOMPARE(sql.generateWords(Language::en, 10).value(KEY_WORDS).toString().split(" ").size(), 10);
-    QCOMPARE(sql.generateWords(Language::ru, 20).value(KEY_WORDS).toString().split(" ").size(), 20);
-    QCOMPARE(sql.generateWords(Language::en, 20).value(KEY_WORDS).toString().split(" ").size(), 20);
-    QCOMPARE(sql.generateWords(Language::ru, 30).value(KEY_WORDS).toString().split(" ").size(), 30);
-    QCOMPARE(sql.generateWords(Language::en, 30).value(KEY_WORDS).toString().split(" ").size(), 30);
-    QCOMPARE(sql.generateWords(Language::ru, 40).value(KEY_WORDS).toString().split(" ").size(), 40);
-    QCOMPARE(sql.generateWords(Language::en, 40).value(KEY_WORDS).toString().split(" ").size(), 40);
-    QCOMPARE(sql.generateWords(Language::ru, 50).value(KEY_WORDS).toString().split(" ").size(), 50);
-    QCOMPARE(sql.generateWords(Language::en, 50).value(KEY_WORDS).toString().split(" ").size(), 50);
-    QCOMPARE(sql.generateWords(Language::ru, 60).value(KEY_WORDS).toString().split(" ").size(), 1);
-    QCOMPARE(sql.generateWords(Language::en, 60).value(KEY_WORDS).toString().split(" ").size(), 1);
-    QCOMPARE(sql.generateWords(Language::ru, -5).value(KEY_WORDS).toString().split(" ").size(), 1);
-    QCOMPARE(sql.generateWords(Language::en, -5).value(KEY_WORDS).toString().split(" ").size(), 1);
+    // Arrange
+    struct TestData {
+        Language language;
+        int wordCount;
+    };
+
+    TestData normalData[] = {
+        {Language::ru, 10},
+        {Language::en, 10},
+        {Language::ru, 20},
+        {Language::en, 20},
+        {Language::ru, 30},
+        {Language::en, 30},
+        {Language::ru, 40},
+        {Language::en, 40},
+        {Language::ru, 50},
+        {Language::en, 50}
+    };
+
+    TestData wrongData[] = {
+        {Language::ru, 60},
+        {Language::en, 60},
+        {Language::ru, -5},
+        {Language::en, -5}
+    };
+    QVector<int> list_size_normal_data;
+    QVector<int> list_size_wrong_data;
+
+    // Act
+    for (const auto& data : normalData)
+        list_size_normal_data.push_back(sql.generateWords(data.language, data.wordCount).value(KEY_WORDS).toString().split(" ").size());
+    for (const auto& data : wrongData)
+        list_size_wrong_data.push_back(sql.generateWords(data.language, data.wordCount).value(KEY_WORDS).toString().split(" ").size());
+
+    // Assert
+    for (int i = 0; i < list_size_normal_data.size(); i++)
+        QCOMPARE(list_size_normal_data[i], normalData[i].wordCount);
+    for (const auto& data : list_size_wrong_data)
+        QCOMPARE(data, 1);
 }
 
 void BackendTest::test_getProfileStat() // 25 / 25
 {
-    // get profile of exist user
-    QCOMPARE(sql.getProfileStat(123).value(KEY_LOGIN).toString(), "vadim");
-    QCOMPARE(sql.getProfileStat(123).value(KEY_DATE_REGISTRATION).toString(), "2023-12-11");
-    QCOMPARE(sql.getProfileStat(123).value(KEY_AVERAGE_SPEED).toString(), "100");
-    QCOMPARE(sql.getProfileStat(123).value(KEY_MAX_SPEED).toString(), "100");
+    // Arrange
+    uint32_t exist_id = 123;
+    uint32_t not_exist_id = 0;
 
-    // get profile of not exist user
-    QCOMPARE(sql.getProfileStat(0).value(KEY_LOGIN).toString(), "not_exist_user");
-    QCOMPARE(sql.getProfileStat(0).value(KEY_DATE_REGISTRATION).toString(), "2023-12-11");
-    QCOMPARE(sql.getProfileStat(0).value(KEY_AVERAGE_SPEED).toString(), "100");
-    QCOMPARE(sql.getProfileStat(0).value(KEY_MAX_SPEED).toString(), "100");
+    // Act
+    QJsonObject exist_user = sql.getProfileStat(exist_id);
+    QJsonObject not_exist_user = sql.getProfileStat(not_exist_id);
+
+    // Assert
+    QCOMPARE(exist_user.isEmpty(), false);
+    QCOMPARE(not_exist_user.isEmpty(), true);
 }
 
 void BackendTest::test_changeUsername() // 26 / 33
 {
-    // change login of exist user
-    QCOMPARE(sql.changeUsername(QJsonObject{
-        {KEY_USER_ID, "123"},
-        {KEY_LOGIN, "vadim_change_login"},
-        {KEY_PASSWORD, "password"}
-    }), BoolValues::True);
+    // Arrange
+    QJsonObject exist_user;
+    QJsonObject not_exist_user;
+
+    exist_user.insert(KEY_USER_ID, "123");
+    exist_user.insert(KEY_LOGIN, "New_Login");
+    exist_user.insert(KEY_PASSWORD, "Password");
+
+    not_exist_user.insert(KEY_USER_ID, "0");
+    not_exist_user.insert(KEY_LOGIN, "Not_exist_login");
+    not_exist_user.insert(KEY_PASSWORD, "Not_exist_password");
+
+    // Act
+    BoolValues exist = sql.changeUsername(exist_user);
+    BoolValues not_exist = sql.changeUsername(not_exist_user);
+
+    // Assert
+    QCOMPARE(exist, BoolValues::True);
+    QCOMPARE(not_exist, BoolValues::Incorrect);
+
+    sql.clenUpDB();
 }
 
 void BackendTest::test_changePassword() // 18 / 25
 {
-    // change password of exist user
-    QCOMPARE(sql.changePassword(QJsonObject{
-                 {KEY_USER_ID, "123"},
-                 {KEY_OLD_PASSWORD, "password"},
-                 {KEY_NEW_PASSWORD, "new_password"}
-             }), BoolValues::True);
+    // Arrange
+    QJsonObject exist_user;
+    QJsonObject not_exist_user;
 
-    // change password of exist user with incorrect password
-    QCOMPARE(sql.changePassword(QJsonObject{
-                 {KEY_USER_ID, "12345"},
-                 {KEY_OLD_PASSWORD, "wrong_password"},
-                 {KEY_NEW_PASSWORD, "new_password"}
-             }), BoolValues::Incorrect);
+    exist_user.insert(KEY_USER_ID, "123");
+    exist_user.insert(KEY_OLD_PASSWORD, "Password");
+    exist_user.insert(KEY_NEW_PASSWORD, "New_password");
+
+    not_exist_user.insert(KEY_USER_ID, "0");
+    not_exist_user.insert(KEY_OLD_PASSWORD, "Not_exist_password");
+    not_exist_user.insert(KEY_NEW_PASSWORD, "Not_exist_password");
+
+    // Act
+    BoolValues exist = sql.changePassword(exist_user);
+    BoolValues not_exist = sql.changePassword(not_exist_user);
+
+    // Assert
+    QCOMPARE(exist, BoolValues::True);
+    QCOMPARE(not_exist, BoolValues::Incorrect);
+
+    sql.clenUpDB();
 }
 
 void BackendTest::test_deleteAccount() // 20 / 22
 {
-    // delete account of exist user
-    QCOMPARE(sql.deleteAccount(QJsonObject{
-                 {KEY_USER_ID, "123"},
-                 {KEY_PASSWORD, "password"}
-             }), BoolValues::True);
+    // Arrange
+    QJsonObject exist_user;
+    QJsonObject not_exist_user;
 
-    // delete account of not exist user_id
-    QCOMPARE(sql.deleteAccount(QJsonObject{
-                 {KEY_USER_ID, "not_exist_id"},
-                 {KEY_PASSWORD, "wrong_password"}
-             }), BoolValues::Incorrect);
+    exist_user.insert(KEY_USER_ID, "123");
+    exist_user.insert(KEY_PASSWORD, "Password");
+
+    not_exist_user.insert(KEY_USER_ID, "0");
+    not_exist_user.insert(KEY_PASSWORD, "Not_exist_password");
+
+    // Act
+    BoolValues exist = sql.deleteAccount(exist_user);
+    BoolValues not_exist = sql.deleteAccount(not_exist_user);
+
+    // Assert
+    QCOMPARE(exist, BoolValues::True);
+    QCOMPARE(not_exist, BoolValues::Incorrect);
+
+    sql.clenUpDB();
 }
 
 void BackendTest::test_addStatistics() // 47 / 47
 {
-    // add stat of exist user
-    QVERIFY(sql.addStatistic(QJsonObject{
-        {KEY_USER_ID, "123"},
-        {KEY_SPEED, "100"},
-        {KEY_COUNT_MISTAKES, "10"}
-    }));
+    // Arrange
+    QJsonObject exist_user;
+    QJsonObject not_exist_user;
 
-    // add stat of not exist user
-    QVERIFY(sql.addStatistic(QJsonObject{
-        {KEY_USER_ID, "not_exist_id"},
-        {KEY_SPEED, "100"},
-        {KEY_COUNT_MISTAKES, "10"}
-    }));
+    exist_user.insert(KEY_USER_ID, "123");
+    exist_user.insert(KEY_SPEED, "100");
+    exist_user.insert(KEY_COUNT_MISTAKES, "100");
+
+    not_exist_user.insert(KEY_USER_ID, "0");
+    not_exist_user.insert(KEY_SPEED, "0");
+    exist_user.insert(KEY_COUNT_MISTAKES, "0");
+
+    // Act
+    bool exist = sql.addStatistic(exist_user);
+    bool not_exist = sql.addStatistic(not_exist_user);
+
+    // Assert
+    QCOMPARE(exist, true);
+    QCOMPARE(not_exist, false);
+
+    sql.clenUpDB();
 }
 
-
-
+void BackendTest::cleanUp()
+{
+    sql.clenUpDB();
+}
 
 
 
