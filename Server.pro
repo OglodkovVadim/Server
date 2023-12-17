@@ -1,6 +1,13 @@
 QT = httpserver sql testlib
 
 CONFIG += c++17 cmdline
+CONFIG += testcase
+CONFIG += qtestcase_loop
+CONFIG += qtestlib_coverage
+
+
+QMAKE_CXXFLAGS += -fprofile-arcs -ftest-coverage
+QMAKE_LFLAGS += -lgcov --coverage
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -25,3 +32,5 @@ HEADERS += \
 
 RESOURCES += \
     src.qrc
+
+TARGET = my_program
