@@ -283,13 +283,4 @@ void BackendTest::test_addStatistics() // 47 / 47
 void BackendTest::cleanupTestCase()
 {
     sql.clenUpDB();
-
 }
-
-
-
-
-
-
-
-
